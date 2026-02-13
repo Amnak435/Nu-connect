@@ -43,7 +43,7 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
         throw new Error('API_KEY_MISSING');
       }
 
-      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
       const prompt = `
         You are "Study Buddy AI", a helpful assistant for a student at NUTECH university.

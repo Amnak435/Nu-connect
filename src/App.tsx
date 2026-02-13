@@ -133,7 +133,6 @@ export default function App() {
     { id: 'announcements', label: 'Announcements', icon: Megaphone },
     { id: 'fees', label: 'Fees & Payments', icon: CreditCard },
     { id: 'complaints', label: 'Complaints', icon: MessageSquare },
-    { id: 'test-api', label: 'Test API', icon: Bot },
   ];
 
   // Add Admin Panel item for admins or owner
