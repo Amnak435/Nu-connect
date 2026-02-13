@@ -401,35 +401,35 @@ export function Contacts() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-2">
-          <Phone className="w-6 h-6 text-green-600" />
-          <h2 className="text-2xl font-bold text-gray-800">NUSIT Computer Science Faculty & Contacts</h2>
+          <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Faculty & Contacts</h2>
         </div>
-        <p className="text-gray-600">Find contact information for CS faculty, lab engineers, and university services</p>
+        <p className="text-sm sm:text-base text-gray-600">Find contact information for CS faculty and services</p>
       </div>
 
       {/* Faculty Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-        <div className="bg-emerald-50 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-emerald-700">3</p>
-          <p className="text-sm text-emerald-600">Senior Faculty</p>
+      <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3 sm:gap-4">
+        <div className="bg-emerald-50 rounded-xl p-3 sm:p-4 text-center">
+          <p className="text-xl sm:text-2xl font-bold text-emerald-700">3</p>
+          <p className="text-xs sm:text-sm text-emerald-600 font-medium">Senior Faculty</p>
         </div>
-        <div className="bg-blue-50 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-blue-700">18</p>
-          <p className="text-sm text-blue-600">Lecturers</p>
+        <div className="bg-blue-50 rounded-xl p-3 sm:p-4 text-center">
+          <p className="text-xl sm:text-2xl font-bold text-blue-700">18</p>
+          <p className="text-xs sm:text-sm text-blue-600 font-medium">Lecturers</p>
         </div>
-        <div className="bg-amber-50 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-amber-700">7</p>
-          <p className="text-sm text-amber-600">Lab Engineers</p>
+        <div className="bg-amber-50 rounded-xl p-3 sm:p-4 text-center">
+          <p className="text-xl sm:text-2xl font-bold text-amber-700">7</p>
+          <p className="text-xs sm:text-sm text-amber-600 font-medium">Lab Engineers</p>
         </div>
-        <div className="bg-purple-50 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-purple-700">4</p>
-          <p className="text-sm text-purple-600">Administration</p>
+        <div className="bg-purple-50 rounded-xl p-3 sm:p-4 text-center">
+          <p className="text-xl sm:text-2xl font-bold text-purple-700">4</p>
+          <p className="text-xs sm:text-sm text-purple-600 font-medium">Admin</p>
         </div>
-        <div className="bg-orange-50 rounded-xl p-4 text-center">
-          <p className="text-2xl font-bold text-orange-700">2</p>
-          <p className="text-sm text-orange-600">Support</p>
+        <div className="bg-orange-50 rounded-xl p-3 sm:p-4 text-center col-span-2 sm:col-span-1">
+          <p className="text-xl sm:text-2xl font-bold text-orange-700">2</p>
+          <p className="text-xs sm:text-sm text-orange-600 font-medium">Support</p>
         </div>
       </div>
 
@@ -449,7 +449,7 @@ export function Contacts() {
           </div>
 
           {/* Category Filter */}
-          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0">
+          <div className="flex gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-hide">
             {categories.map((category) => (
               <button
                 key={category}

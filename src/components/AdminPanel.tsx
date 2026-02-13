@@ -303,32 +303,34 @@ export function AdminPanel() {
                 </div>
             </div>
 
-            {/* Tabs */}
-            <div className="flex gap-2 p-1 bg-gray-200/50 rounded-xl w-fit">
-                {[
-                    { id: 'announcements', label: 'Announcements', icon: Megaphone },
-                    { id: 'timetable', label: 'Timetable', icon: Calendar },
-                    { id: 'documents', label: 'Academic Docs', icon: FileText },
-                    { id: 'fees', label: 'Fees & Payments', icon: CreditCard },
-                    { id: 'users', label: 'Students', icon: User },
-                    { id: 'attendance', label: 'Attendance', icon: GraduationCap },
-                    { id: 'complaints', label: 'Complaints', icon: MessageSquare },
-                ].map((tab) => (
-                    <button
-                        key={tab.id}
-                        onClick={() => {
-                            setActiveTab(tab.id as AdminTab);
-                            setIsAdding(false);
-                        }}
-                        className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${activeTab === tab.id
-                            ? 'bg-white text-green-700 shadow-sm'
-                            : 'text-gray-600 hover:text-gray-800'
-                            }`}
-                    >
-                        <tab.icon className="w-4 h-4" />
-                        {tab.label}
-                    </button>
-                ))}
+            {/* Tabs - Scrollable on Mobile */}
+            <div className="flex gap-2 p-1 bg-gray-200/50 rounded-xl w-full overflow-x-auto scrollbar-hide">
+                <div className="flex gap-2 min-w-max p-1">
+                    {[
+                        { id: 'announcements', label: 'Announcements', icon: Megaphone },
+                        { id: 'timetable', label: 'Timetable', icon: Calendar },
+                        { id: 'documents', label: 'Academic Docs', icon: FileText },
+                        { id: 'fees', label: 'Fees & Payments', icon: CreditCard },
+                        { id: 'users', label: 'Students', icon: User },
+                        { id: 'attendance', label: 'Attendance', icon: GraduationCap },
+                        { id: 'complaints', label: 'Complaints', icon: MessageSquare },
+                    ].map((tab) => (
+                        <button
+                            key={tab.id}
+                            onClick={() => {
+                                setActiveTab(tab.id as AdminTab);
+                                setIsAdding(false);
+                            }}
+                            className={`flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all ${activeTab === tab.id
+                                ? 'bg-white text-green-700 shadow-sm'
+                                : 'text-gray-600 hover:text-gray-800'
+                                }`}
+                        >
+                            <tab.icon className="w-4 h-4" />
+                            {tab.label}
+                        </button>
+                    ))}
+                </div>
             </div>
 
             {/* Content Area */}
@@ -354,10 +356,10 @@ export function AdminPanel() {
                         <p className="text-gray-500">Loading live data...</p>
                     </div>
                 ) : isAdding ? (
-                    <div className="p-6 max-w-2xl">
+                    <div className="p-4 sm:p-6 max-w-2xl">
                         {activeTab === 'announcements' ? (
                             <form onSubmit={handleCreateAnnouncement} className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div className="col-span-2">
                                         <label className="block text-sm font-medium mb-1">Title</label>
                                         <input
@@ -468,7 +470,7 @@ export function AdminPanel() {
                             </form>
                         ) : activeTab === 'fees' ? (
                             <form onSubmit={handleCreateFeeStructure} className="space-y-6">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <label className="block text-sm font-medium mb-1">For Semester</label>
                                         <select
@@ -543,14 +545,14 @@ export function AdminPanel() {
                             </div>
                         ) : (
                             <form onSubmit={handleCreateDocument} className="space-y-6">
-                                <div className="grid grid-cols-2 gap-4">
-                                    <div className="col-span-2">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                    <div className="sm:col-span-2">
                                         <label className="block text-sm font-medium mb-2 font-bold text-gray-700">
                                             {activeTab === 'timetable' ? 'Upload New Timetable (Image/PDF)' : 'Upload Academic Document'}
                                         </label>
 
                                         {/* File Upload Trigger */}
-                                        <div className="relative group cursor-pointer border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-green-500 hover:bg-green-50/50 transition-all">
+                                        <div className="relative group cursor-pointer border-2 border-dashed border-gray-300 rounded-xl p-4 sm:p-8 text-center hover:border-green-500 hover:bg-green-50/50 transition-all">
                                             <input
                                                 type="file"
                                                 className="absolute inset-0 opacity-0 cursor-pointer"
@@ -565,7 +567,7 @@ export function AdminPanel() {
                                             ) : docForm.file_url ? (
                                                 <div className="flex flex-col items-center">
                                                     <CheckCircle className="w-10 h-10 text-green-600 mb-2" />
-                                                    <p className="text-sm font-medium text-green-700">{docForm.title}</p>
+                                                    <p className="text-sm font-medium text-green-700 truncate max-w-xs">{docForm.title}</p>
                                                     <p className="text-xs text-gray-500">File ready! Complete the details below.</p>
                                                 </div>
                                             ) : (

@@ -34,9 +34,9 @@ const defaultSchedules: Record<string, Record<string, ClassSlot[]>> = {
 
 // Time slots for reference
 const timeSlots = [
-  '08:30 – 09:20', '09:20 – 10:10', '10:10 – 11:00', '11:00 – 11:50', '11:15 – 12:05',
-  '11:50 – 12:40', '12:40 – 13:30', '12:50 – 13:40', '13:30 – 14:20', '13:45 – 14:35',
-  '14:20 – 15:10', '14:40 – 15:30', '15:10 – 16:00',
+  '08:30-09:20', '09:20-10:10', '10:10-11:00', '11:00-11:50', '11:15-12:05',
+  '11:50-12:40', '12:40-13:30', '12:50-13:40', '13:30-14:20', '13:45-14:35',
+  '14:20-15:10', '14:40-15:30', '15:10-16:00',
 ];
 
 export function WeeklyPlan({ user }: WeeklyPlanProps) {
@@ -152,12 +152,12 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
       {/* Header */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <div className="flex items-center gap-3 mb-2">
-              <Calendar className="w-6 h-6 text-green-600" />
-              <h2 className="text-2xl font-bold text-gray-800">Weekly Timetable</h2>
+          <div className="flex-1">
+            <div className="flex items-center gap-2 sm:gap-3 mb-1 sm:mb-2">
+              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 shrink-0" />
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Weekly Timetable</h2>
             </div>
-            <p className="text-gray-600">
+            <p className="text-xs sm:text-sm text-gray-600">
               NUTECH CS Department • {isSpring ? 'Spring' : 'Fall'} 2026
             </p>
           </div>
@@ -240,12 +240,12 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
 
       {/* Day Selector */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-        <div className="flex gap-2 overflow-x-auto pb-2">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {days.map((day) => (
             <button
               key={day}
               onClick={() => setSelectedDay(day)}
-              className={`px-6 py-3 rounded-lg font-medium transition-all whitespace-nowrap flex items-center gap-2 ${selectedDay === day
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-all whitespace-nowrap flex items-center gap-2 ${selectedDay === day
                 ? 'bg-green-600 text-white shadow-md'
                 : day === today
                   ? 'bg-green-100 text-green-700 border-2 border-green-300'
@@ -254,7 +254,7 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
             >
               {day}
               {day === today && selectedDay !== day && (
-                <span className="w-2 h-2 bg-green-500 rounded-full"></span>
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
               )}
             </button>
           ))}
@@ -362,7 +362,12 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
               {timeSlots.map((slot) => {
                 const dayEntries = days.map(day => {
                   const daySchedule = activeSchedules[selectedSemester]?.[day] || [];
-                  return daySchedule.find(c => c.time === slot);
+                  // Match with tolerance for hyphens/spaces
+                  return daySchedule.find(c => {
+                    const normalizedC = c.time.replace(/\s/g, '').replace(/–/g, '-');
+                    const normalizedSlot = slot.replace(/\s/g, '').replace(/–/g, '-');
+                    return normalizedC === normalizedSlot;
+                  });
                 });
 
                 const hasAnyClass = dayEntries.some(c => !!c);
@@ -407,34 +412,34 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
       </div>
 
       {/* Weekly Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
           <div className="text-center">
-            <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Calendar className="w-6 h-6 text-green-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">{stats.totalClasses}</p>
-            <p className="text-sm text-gray-600 mt-1">Total Classes/Week</p>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stats.totalClasses}</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase tracking-wider font-semibold">Classes/Week</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
           <div className="text-center">
-            <div className="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-3">
-              <FlaskConical className="w-6 h-6 text-purple-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <FlaskConical className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">{stats.labSessions}</p>
-            <p className="text-sm text-gray-600 mt-1">Lab Sessions</p>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stats.labSessions}</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase tracking-wider font-semibold">Labs</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 col-span-2 md:col-span-1">
           <div className="text-center">
-            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
-              <BookOpen className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">{stats.uniqueCourses}</p>
-            <p className="text-sm text-gray-600 mt-1">Courses</p>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stats.uniqueCourses}</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase tracking-wider font-semibold">Courses</p>
           </div>
         </div>
       </div>

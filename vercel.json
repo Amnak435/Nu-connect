@@ -1,7 +1,9 @@
 {
+    "name": "nu-connect",
+    "alias": "nu-connecct.vercel.app",
     "framework": "vite",
     "buildCommand": "npm run build",
-    "outputDirectory": "build",
+    "outputDirectory": "dist",
     "rewrites": [
         {
             "source": "/(.*)",

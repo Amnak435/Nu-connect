@@ -347,9 +347,9 @@ export function Login({ onLogin }: LoginProps) {
   );
 
   const renderRegisterForm = () => (
-    <form onSubmit={handleRegister} className="space-y-4">
-      <div className="grid grid-cols-2 gap-4">
-        <div className="col-span-2">
+    <form onSubmit={handleRegister} className="space-y-4 max-h-[60vh] overflow-y-auto pr-1 scrollbar-hide">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="sm:col-span-2">
           <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-1">
             Full Name
           </label>
@@ -367,7 +367,7 @@ export function Login({ onLogin }: LoginProps) {
           </div>
         </div>
 
-        <div className="col-span-2">
+        <div className="sm:col-span-2">
           <label htmlFor="regEmail" className="block text-sm font-medium text-gray-700 mb-1">
             Email Address
           </label>
@@ -385,7 +385,7 @@ export function Login({ onLogin }: LoginProps) {
           </div>
         </div>
 
-        <div className="col-span-2">
+        <div className="sm:col-span-2">
           <label htmlFor="nutechId" className="block text-sm font-medium text-gray-700 mb-1">
             NUTECH ID / Registration Number <span className="text-gray-400 font-normal">(Optional)</span>
           </label>
@@ -431,7 +431,7 @@ export function Login({ onLogin }: LoginProps) {
           </select>
         </div>
 
-        <div className="col-span-2">
+        <div className="sm:col-span-2">
           <label htmlFor="regSemester" className="block text-sm font-medium text-gray-700 mb-1">
             Current Semester
           </label>
@@ -447,7 +447,7 @@ export function Login({ onLogin }: LoginProps) {
           </select>
         </div>
 
-        <div className="col-span-2">
+        <div className="sm:col-span-2">
           <label htmlFor="regPassword" className="block text-sm font-medium text-gray-700 mb-1">
             Password
           </label>
@@ -465,14 +465,14 @@ export function Login({ onLogin }: LoginProps) {
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 z-10"
             >
               {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        <div className="col-span-2">
+        <div className="sm:col-span-2">
           <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-1">
             Confirm Password
           </label>
@@ -630,18 +630,18 @@ export function Login({ onLogin }: LoginProps) {
       {/* Content */}
       <div className="relative w-full max-w-md z-10">
         {/* Logo and Title */}
-        <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center mb-4">
-            <img src={nutechLogo} alt="NUTECH Logo" className="w-24 h-24 drop-shadow-2xl" />
+        <div className="text-center mb-6 sm:mb-8">
+          <div className="inline-flex items-center justify-center mb-2 sm:mb-4">
+            <img src={nutechLogo} alt="NUTECH Logo" className="w-16 sm:w-24 h-16 sm:h-24 drop-shadow-2xl" />
           </div>
-          <h1 className="text-4xl font-bold text-white mb-2">NUConnect</h1>
-          <p className="text-green-100 text-lg">Your Digital Campus</p>
-          <p className="text-green-200 text-sm mt-2">National University of Technology</p>
+          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-1 sm:mb-2">NUConnect</h1>
+          <p className="text-green-100 text-sm sm:text-lg">Your Digital Campus</p>
+          <p className="text-green-200 text-[10px] sm:text-sm mt-1 sm:mt-2">National University of Technology</p>
         </div>
 
         {/* Auth Form */}
-        <div className="bg-white rounded-2xl shadow-2xl p-8">
-          <h2 className="text-2xl font-bold text-gray-800 mb-6 text-center">
+        <div className="bg-white rounded-2xl shadow-2xl p-4 sm:p-8">
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800 mb-4 sm:mb-6 text-center">
             {mode === 'login' && 'Student Login'}
             {mode === 'register' && 'Create Account'}
             {mode === 'verify' && 'Email Verification'}

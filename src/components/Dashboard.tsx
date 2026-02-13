@@ -65,7 +65,7 @@ export function Dashboard({ user }: DashboardProps) {
 
     if (!error && entries && entries.length > 0) {
       setTodaysClasses(entries.map(e => ({
-        time: e.time_slot,
+        time: e.time_slot.replace(/\s/g, '').replace(/–/g, '-'),
         subject: e.subject,
         room: e.venue,
         faculty: e.faculty_name
@@ -97,10 +97,10 @@ export function Dashboard({ user }: DashboardProps) {
       <div className="bg-gradient-to-r from-green-600 to-green-800 rounded-xl p-6 text-white shadow-lg">
         <div className="flex justify-between items-start">
           <div className="flex-1">
-            <div className="flex items-center gap-2 mb-2">
-              <h2 className="text-2xl font-bold">Welcome back, {user.name.split(' ')[0]}! 👋</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-2 mb-2">
+              <h2 className="text-xl sm:text-2xl font-bold">Welcome back, {user.name.split(' ')[0]}! 👋</h2>
               {user.role === 'admin' && (
-                <span className="bg-white/20 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border border-white/30 backdrop-blur-sm">
+                <span className="w-fit bg-white/20 text-white text-[10px] uppercase font-bold px-2 py-0.5 rounded-full border border-white/30 backdrop-blur-sm">
                   Admin
                 </span>
               )}
@@ -168,14 +168,14 @@ export function Dashboard({ user }: DashboardProps) {
             </div>
           </form>
         ) : (
-          <div className="mt-4 flex flex-wrap gap-4">
-            <div className="bg-white/10 rounded-lg px-4 py-2 backdrop-blur-sm">
-              <p className="text-xs text-green-100">Current Semester</p>
-              <p className="font-semibold">{user.semester}</p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <div className="bg-white/10 rounded-lg px-2.5 py-1.5 backdrop-blur-sm">
+              <p className="text-[9px] text-green-100 italic leading-none">Semester</p>
+              <p className="text-sm font-semibold mt-0.5">{user.semester}</p>
             </div>
-            <div className="bg-white/10 rounded-lg px-4 py-2 backdrop-blur-sm">
-              <p className="text-xs text-green-100">Registration No</p>
-              <p className="font-semibold">{user.registrationNo}</p>
+            <div className="bg-white/10 rounded-lg px-2.5 py-1.5 backdrop-blur-sm">
+              <p className="text-[9px] text-green-100 italic leading-none">Reg / ID</p>
+              <p className="text-sm font-semibold mt-0.5">{user.registrationNo}</p>
             </div>
           </div>
         )}
@@ -245,21 +245,13 @@ export function Dashboard({ user }: DashboardProps) {
               </div>
             ) : (
               todaysClasses.map((cls, index) => (
-                <div key={index} className="flex gap-4 p-4 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors">
+                <div key={index} className="flex gap-3 sm:gap-4 p-3 sm:p-4 bg-gray-50 rounded-lg hover:bg-green-50 transition-colors">
                   <div className="text-center shrink-0">
-                    <div className="w-16 h-16 bg-green-600 text-white rounded-lg flex flex-col items-center justify-center overflow-hidden">
-                      {cls.time?.includes(' ') ? (
-                        <>
-                          <span className="text-[10px] uppercase font-bold opacity-80">Time</span>
-                          <span className="text-sm font-bold">{cls.time.split(' ')[0]}</span>
-                          <span className="text-[10px] uppercase font-bold opacity-80">{cls.time.split(' ')[1]}</span>
-                        </>
-                      ) : (
-                        <>
-                          <Clock className="w-5 h-5 mb-1 opacity-80" />
-                          <span className="text-[10px] font-bold truncate px-1">{cls.time}</span>
-                        </>
-                      )}
+                    <div className="w-14 sm:w-20 h-14 sm:h-20 bg-green-600 text-white rounded-lg flex flex-col items-center justify-center overflow-hidden shadow-md">
+                      <Clock className="w-3.5 sm:w-5 h-3.5 sm:h-5 mb-0.5 sm:mb-1 opacity-80" />
+                      <span className="text-[9px] sm:text-xs font-bold px-1 text-center leading-tight">
+                        {cls.time}
+                      </span>
                     </div>
                   </div>
                   <div className="flex-1">

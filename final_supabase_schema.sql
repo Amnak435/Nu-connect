@@ -108,9 +108,16 @@ CREATE POLICY "Students create complaints" ON complaints
 FOR INSERT WITH CHECK (auth.uid() = student_id);
 
 -- ADMIN POLICIES (Full Access)
+DROP POLICY IF EXISTS "Admins full access" ON attendance;
 CREATE POLICY "Admins full access" ON attendance FOR ALL USING (auth.jwt() ->> 'email' = 'f24605061@nutech.edu.pk');
+
+DROP POLICY IF EXISTS "Admins full access complaints" ON complaints;
 CREATE POLICY "Admins full access complaints" ON complaints FOR ALL USING (auth.jwt() ->> 'email' = 'f24605061@nutech.edu.pk');
+
+DROP POLICY IF EXISTS "Admins full access docs" ON academic_documents;
 CREATE POLICY "Admins full access docs" ON academic_documents FOR ALL USING (auth.jwt() ->> 'email' = 'f24605061@nutech.edu.pk');
+
+DROP POLICY IF EXISTS "Admins full access timetable" ON timetable_entries;
 CREATE POLICY "Admins full access timetable" ON timetable_entries FOR ALL USING (auth.jwt() ->> 'email' = 'f24605061@nutech.edu.pk');
 
 -- 8. INDEXES

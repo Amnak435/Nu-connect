@@ -1,147 +1,105 @@
-# 📘 NUConnect Student Portal - User Manual
-
-Welcome to **NUConnect**, the centralized digital campus portal designed specifically for NUTECH students. This guide will help you navigate and use all the features effectively.
-
----
-
-## 🚀 1. Getting Started
-
-### Registration
-- Go to the portal URL.
-- Click **"Register Now"**.
-- Fill in your details (Full Name, Email, Batch, Semester, Section).
-- *Note: NUTECH ID is optional.*
-- Since email verification is currently disabled, you will be logged in immediately after clicking **"Create Account"**.
-
-### Login
-- Use your registered email and password.
-- If you've forgotten your password, use the **"Forgot Password?"** link to receive a reset email.
+# NUConnect: Digital Campus User Guide
+**A Comprehensive Manual for Students & Faculty**
+*Created by Amna Khurram | CS Batch 2024*
 
 ---
 
-## 🏠 2. Dashboard
-The Dashboard is your command center. It shows:
-- **Quick Stats:** Your current semester and department.
-- **Today's Schedule:** A quick look at your classes for the current day.
-- **Recent Announcements:** The latest news from the department and university.
+## 🌟 Introduction
+Welcome to **NUConnect**, the centralized digital hub for the National University of Technology (NUTECH) Computer Science Department. This portal is designed to streamline your academic life by providing real-time access to schedules, announcements, fee management, and AI-powered study tools.
+
+## 🚀 Getting Started
+
+### 1. Account Creation & Login
+*   **Registration**: New users must sign up using their university email address. Ensure you select your correct **Batch** (e.g., 2024), **Section**, and **Current Semester**.
+*   **Verification**: After registration, a verification link will be sent to your email. You must verify your account to access the dashboard.
+*   **Login**: Use your university credentials to sign in. If you forget your password, use the "Forgot Password" link or the emergency reset option if configured.
 
 ---
 
-## 📅 3. Weekly Plan (Timetable)
-This is a high-powered schedule manager.
-- **Semester Selector:** View timetables for all 8 semesters.
-- **Daily View:** Click on day tabs (Mon-Fri) to see specific class timings, subjects, and venues (e.g., AC-301, CL-01).
-- **Weekly Overview:** A full table view of your week.
-- **Course List:** Detailed list of all subjects in your semester with assigned faculty (e.g., Lec. Alina Maryum, Lec. Sundas Rana).
+## 📂 Core Features
+
+### 📅 Weekly Plan (Timetable)
+*   **Personalized Schedule**: The portal automatically displays the timetable relevant to your Semester, Batch, and Section.
+*   **Daily View**: Check exactly what classes you have today, including room numbers (venues) and faculty names.
+*   **Full Week View**: Switch to the "Full Week" tab to see your entire weekly load in a standard grid format.
+*   **Lab Indicators**: Practical sessions (Labs) are highlighted in purple, while lectures are in green.
+
+### 📢 Announcements
+*   **Real-time Updates**: Never miss a deadline. Announcements are filtered by priority (High, Medium, Low).
+*   **Targeted Notifications**: You will only see announcements relevant to your department or specific batch, keeping your feed noise-free.
+
+### 💰 Fee Management
+*   **Status Tracking**: Check if your current semester fee is paid, unpaid, or pending verification.
+*   **Challan Upload**: Directly upload a screenshot of your bank receipt or online payment proof.
+*   **Official Forms**: Download NUTECH-approved forms for installments, fee deferment, or transcript requests.
+
+### 📚 Study Buddy AI
+*   **Academic Assistant**: Use the built-in AI to ask questions about your coursework, clarify complex CS concepts, or get help with coding problems.
+
+### � Syllabus & Datesheets
+*   **Download Syllabus**: Access the "Syllabus" tab to view or download course outlines and learning objectives for your current semester.
+*   **Latest Datesheets**: Midterm and Final examination schedules are posted here as soon as they are finalized by the department.
+
+### 🏫 Classroom Sync
+*   **Direct Access**: The "Classroom Sync" tab provides a direct bridge to your Official Google Classrooms. No more searching for codes; just click to jump to your course materials and assignments.
+
+### 📝 Lecture Materials
+*   **Course Repository**: Students can download lecture slides, notes, and reference materials uploaded by their instructors under the "Academic Documents" or "Syllabus" sections.
+
+### �📞 Faculty Contacts
+*   **Department Directory**: Find contact emails, office locations, and consultation hours for all CS faculty, lecturers, and lab engineers.
+*   **Emergency Contact**: Quick access to university security and medical center numbers.
 
 ---
 
-## 📝 4. Exams & Academics
-
-### Date Sheet
-- View Midterm and Final Exam schedules.
-- See venues and timings for your specific subjects.
-- Countdown timers show you exactly how many days are left for each exam.
-
-### Syllabus
-- View and download course outlines for all subjects.
-- Stay updated on what topics will be covered in your exams.
-
-# NUConnect — Admin Instructions
-
-## 🛡️ Accessing the Admin Panel
-1. Ensure your account has 'Admin' privileges.
-2. Log in with your university credentials.
-3. Select **🛡️ Admin Panel** from the sidebar.
-
-## 📅 Managing Timetables (Image/PDF)
-Instead of manual entry, you can now upload the official timetable as an image or PDF:
-1. Go to **Admin Panel > Timetable**.
-2. Click **Add New**.
-3. Select the **Semester** and **Batch** for this timetable.
-4. Upload the image/PDF file from your device.
-5. Click **Publish Timetable**.
-6. The timetable will now appear prominently at the top of the **Weekly Plan** page for all students in that group.
-
-## 📄 Academic Documents
-To upload Syllabus or Date Sheets:
-1. Go to **Admin Panel > Academic Docs**.
-2. Click **Add New**.
-3. Select the **Category** (e.g., Syllabus), **Semester**, and **Batch**.
-4. Upload the file.
-5. Click **Publish Document**.
-6. Students will find these in their respective **Syllabus** or **Date Sheet** pages.
-
-## ⚙️ Supabase Setup (Very Important)
-Before uploading files, you must create a Storage bucket in Supabase:
-1. Go to your **Supabase Dashboard**.
-2. Go to **Storage**.
-3. Create a new **Public** bucket named `portal-docs`.
-4. Ensure the bucket has **RLS policies** to allow 'Authenticated' users to upload and 'Everyone' to view.
+## 📱 Mobile Experience
+NUConnect is fully optimized for smartphones. You can:
+*   Add the website to your phone's Home Screen for app-like access.
+*   Easily view your timetable while on the move.
+*   Receive and read important notifications instantly.
 
 ---
 
-# NUConnect Portal — Student Guide
+## 🛠️ Admin & Faculty Control Panel
+*This section is for authorized personnel only (Admins and Department Heads).*
 
-## 🤖 5. Special Features
+### 1. Accessing the Admin Panel
+*   Admins can access the **Admin Panel** from the sidebar/mobile menu.
+*   The panel allows for data management without requiring any technical knowledge or SQL access.
 
-### Study Buddy AI
-- Personalized AI assistant to help you with your studies.
-- Ask questions about your courses or general academic advice.
+### 2. Managing Data
+*   **Announcements**:
+    *   **How it works**: When you post an announcement, it is instantly pushed to the students. 
+    *   **Targeting**: Use the filters to ensure **High Priority** messages (like exam changes) stand out. You can target specific sections (e.g., CS-1A only) or the entire batch.
+*   **Syllabus & Documents**:
+    *   **Uploading**: Lecturers can upload PDF or High-Resolution images of syllabus outlines and lecture notes.
+    *   **Tagging**: Always tag the document with the correct **Subject Name** and **Instructor** so students can find it easily in their downloads.
+*   **Fee Verification Workflow**:
+    1.  **Student Action**: Student uploads a picture of their paid challan.
+    2.  **Admin Review**: Admins view the "Fees" tab to see the list of pending proofs.
+    3.  **Cross-Verification**: Compare the uploaded image with the bank's portal.
+    4.  **Status Update**: Mark as "Verified" (which updates the student's dashboard to 'Paid') or "Rejected" (with a reason, prompting them to re-upload).
 
-### Classroom Sync
-- View your Google Classroom assignments and links in one place.
-- Keep track of deadlines and submission statuses.
-
----
-
-## 📞 6. Contacts & Communication
-
-### Faculty Contacts
-- Search for faculty members by name or specialization.
-- Get official emails (e.g., `alinamaryum@nutech.edu.pk`) and office locations.
-- Specialized categories for Senior Faculty, Lecturers, and Lab Engineers.
-
-### Announcements
-- Filter news by Priority (High/Medium/Low) or Category (Exams, Events, Academic).
-- Stay updated on site-wide notifications.
-
----
-
-## 💰 7. Fees & Complaints
-
-### Fees & Payments
-- View your current fee status (Paid/Unpaid).
-- Download official NUTECH fee forms (Installment policy, etc.).
-- Securely upload your payment proof (receipt screenshots).
-
-### Complaints
-- Submit academic or campus-related complaints directly through the portal.
-- Track the status of your reported issues.
+### 3. Bulk Attendance Import (For Teachers)
+Teachers can import attendance in seconds using a CSV file.
+*   **File Format**: CSV (Comma Separated Values) exported from Excel.
+*   **Required Columns**: The CSV **MUST** have exactly these headers in the first row:
+    `student_id, student_name, course_name, attended, total, semester, batch, section`
+*   **Column Details**:
+    *   `student_id`: University Registration Number (e.g., F24605061)
+    *   `attended`: Number of classes present.
+    *   `total`: Total classes held to date.
+    *   `semester/batch/section`: Used to match the student's profile precisely.
 
 ---
 
-## 🔐 8. Troubleshooting
-
-### "Database Error" or "Empty Data"
-- Ensure you have run the `supabase-setup.sql` in your Supabase SQL Editor. This is required for profiles to work.
-
-### Folder Location
-- Your project files are located at: `C:\Users\hp\Downloads\Centralized Student Portal\NU- Connect`
-
-### Running Locally
-- Open PowerShell in the folder.
-- Run: `npm run dev`
-- Open: `http://localhost:3000`
+## 🛠️ Support & Troubleshooting
+If you encounter any technical issues or find discrepancies in the timetable data:
+1.  **Check Profile**: Ensure your Semester/Section is set correctly in the Dashboard.
+2.  **Clear Cache**: If data doesn't update, try refreshing your browser.
+3.  **Contact Support**: Reach out to the IT Help Desk via the Contacts section.
 
 ---
 
-## 👩‍💻 Credits
-**Developed by:** Amna Khurram
-**Department:** Computer Science, 2024 Batch
-**ID:** F24605061
-**Specialization:** Full Stack Development
-
----
-
-*For technical support, contact the IT Help Desk via the Contacts section.*
+**© 2026 National University of Technology — NUSIT CS Department**
+*Developed with ❤️ by Amna Khurram (F24605061)*

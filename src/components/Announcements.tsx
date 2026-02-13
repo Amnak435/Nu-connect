@@ -92,12 +92,12 @@ export function Announcements({ user }: AnnouncementsProps) {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
         <div className="flex items-center gap-3 mb-2">
-          <Megaphone className="w-6 h-6 text-green-600" />
-          <h2 className="text-2xl font-bold text-gray-800">Important Announcements</h2>
+          <Megaphone className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+          <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Important Announcements</h2>
         </div>
-        <p className="text-gray-600">Stay updated with the latest campus news and notifications</p>
+        <p className="text-sm sm:text-base text-gray-600">Stay updated with the latest campus news</p>
       </div>
 
       {/* Filters */}
@@ -107,17 +107,17 @@ export function Announcements({ user }: AnnouncementsProps) {
           <h3 className="font-semibold text-gray-800">Filter Announcements</h3>
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 sm:space-y-6">
           {/* Category Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Category</label>
-            <div className="flex flex-wrap gap-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 uppercase tracking-wider">Category</label>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {categories.map((category) => (
                 <button
                   key={category}
                   onClick={() => setSelectedFilter(category)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${selectedFilter === category
-                    ? 'bg-green-600 text-white'
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${selectedFilter === category
+                    ? 'bg-green-600 text-white shadow-sm'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
@@ -129,14 +129,14 @@ export function Announcements({ user }: AnnouncementsProps) {
 
           {/* Priority Filter */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-            <div className="flex flex-wrap gap-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2 uppercase tracking-wider">Priority Level</label>
+            <div className="flex flex-wrap gap-1.5 sm:gap-2">
               {priorities.map((priority) => (
                 <button
                   key={priority}
                   onClick={() => setSelectedPriority(priority)}
-                  className={`px-4 py-2 rounded-lg font-medium transition-all text-sm ${selectedPriority === priority
-                    ? 'bg-green-600 text-white'
+                  className={`px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium transition-all text-xs sm:text-sm ${selectedPriority === priority
+                    ? 'bg-green-600 text-white shadow-sm'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                     }`}
                 >
@@ -207,50 +207,50 @@ export function Announcements({ user }: AnnouncementsProps) {
       )}
 
       {/* Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
           <div className="text-center">
-            <div className="w-12 h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Megaphone className="w-6 h-6 text-blue-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <Megaphone className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">{announcements.length}</p>
-            <p className="text-sm text-gray-600 mt-1">Total Announcements</p>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{announcements.length}</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase font-semibold">Total</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
           <div className="text-center">
-            <div className="w-12 h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-3">
-              <AlertCircle className="w-6 h-6 text-red-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-red-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <AlertCircle className="w-5 h-5 sm:w-6 sm:h-6 text-red-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
               {announcements.filter(a => a.priority === 'high').length}
             </p>
-            <p className="text-sm text-gray-600 mt-1">High Priority</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase font-semibold text-red-600">High</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
           <div className="text-center">
-            <div className="w-12 h-12 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-3">
-              <Info className="w-6 h-6 text-yellow-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-yellow-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <Info className="w-5 h-5 sm:w-6 sm:h-6 text-yellow-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
               {announcements.filter(a => a.priority === 'medium').length}
             </p>
-            <p className="text-sm text-gray-600 mt-1">Medium Priority</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase font-semibold text-yellow-600">Medium</p>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
           <div className="text-center">
-            <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3">
-              <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <CheckCircle className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">
               {announcements.filter(a => a.priority === 'low').length}
             </p>
-            <p className="text-sm text-gray-600 mt-1">Low Priority</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase font-semibold text-green-600">Low</p>
           </div>
         </div>
       </div>
