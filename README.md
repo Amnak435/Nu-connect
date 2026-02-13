@@ -2,7 +2,11 @@
 
 NUConnect is a premium, real-time student portal designed specifically for the **National University of Technology (NUTECH)** Computer Science department. It provides an all-in-one digital ecosystem for managing academic life with precision and style.
 
-## 🚀 Key Features
+## 🚀 Live Demo & Repository
+- **Live Deployment:** [nu-connect.vercel.app](https://nu-connect.vercel.app)
+- **GitHub Repository:** [Amnak435/Nu-connect](https://github.com/Amnak435/Nu-connect)
+
+## 📡 Key Features
 - **Intelligent Dashboard:** Real-time summary of student progress and university updates.
 - **Dynamic Timetable:** Section-specific schedules with automated "Today" tracking.
 - **Classroom Sync:** Integrated attendance tracking (with 75% risk alerts) and material management.
