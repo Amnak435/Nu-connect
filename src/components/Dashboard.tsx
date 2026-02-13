@@ -78,16 +78,16 @@ export function Dashboard({ user }: DashboardProps) {
   };
 
   const upcomingDeadlines = [
-    { type: 'Assignment', course: 'Data Structures', title: 'Binary Tree Implementation', dueDate: 'Jan 25, 2026', urgent: true },
-    { type: 'Quiz', course: 'Database Systems', title: 'SQL Queries Quiz', dueDate: 'Jan 28, 2026', urgent: false },
-    { type: 'Project', course: 'Software Engineering', title: 'SRS Document Submission', dueDate: 'Feb 02, 2026', urgent: false },
+    { type: 'Assignment', course: 'Theory of Automata', title: 'NFA to DFA Conversion', dueDate: 'Feb 18, 2026', urgent: true },
+    { type: 'Quiz', course: 'Advanced DMS', title: 'Propositional Logic Quiz', dueDate: 'Feb 20, 2026', urgent: false },
+    { type: 'Lab', course: 'Applied Physics', title: 'Waves & Oscillations Report', dueDate: 'Feb 22, 2026', urgent: false },
   ];
 
   const announcements = [
-    { title: 'NUTECH & PCCA Seminar on Climate-Resilient Pakistan', time: 'Jan 29, 2026', priority: 'high' },
-    { title: 'Ali Trust Pakistan Delegation Visits NUTECH', time: 'Jan 28, 2026', priority: 'medium' },
-    { title: 'Industry Partnership Workshop on Contract Management', time: 'Jan 25, 2026', priority: 'medium' },
-    { title: 'Career Fair 2026 Registration Opens Soon', time: 'Jan 20, 2026', priority: 'low' },
+    { title: 'Midterm Examination Schedule Released!', time: 'Today', priority: 'high' },
+    { title: 'New Lecture Materials uploaded for Automata', time: 'Yesterday', priority: 'medium' },
+    { title: 'Physics Lab Session rescheduled to Hall A', time: '2 days ago', priority: 'medium' },
+    { title: 'Welcome to CS 2024 Batch Section B Portal', time: 'Jan 2026', priority: 'low' },
   ];
 
 
