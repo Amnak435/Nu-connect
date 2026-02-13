@@ -1,18 +1,23 @@
 import { useState } from 'react';
 import { Bot, Send, Sparkles, BookOpen, Brain, Trophy } from 'lucide-react';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 interface StudyBuddyProps {
   user: any;
 }
 
+// Initialize Gemini API (User needs to add VITE_GEMINI_API_KEY to .env)
+const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
+
 export function StudyBuddy({ user }: StudyBuddyProps) {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; content: string }>>([
     {
       role: 'ai',
-      content: `Hello ${user.name.split(' ')[0]}! 👋 I'm your Study Buddy AI. I'm here to help you with your ${user.semester} courses. How can I assist you today?`
+      content: `Hello ${user.name.split(' ')[0]}! 👋 I'm your Study Buddy AI, powered by Gemini. I'm here to help you with your ${user.semester} courses and any academic questions. How can I assist you today?`
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
 
   const quickActions = [
     { icon: BookOpen, label: 'Explain a topic', prompt: 'Can you explain Binary Search Trees?' },
@@ -21,41 +26,59 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
     { icon: Sparkles, label: 'Revision tips', prompt: 'Give me revision tips for Data Structures' }
   ];
 
-  const sampleResponses: Record<string, string> = {
-    'binary search tree': 'A Binary Search Tree (BST) is a tree data structure where:\n\n1. Each node has at most two children (left and right)\n2. Left subtree contains only nodes with values less than parent\n3. Right subtree contains only nodes with values greater than parent\n4. Both left and right subtrees must also be BSTs\n\nTime Complexity:\n• Search: O(log n) average, O(n) worst\n• Insert: O(log n) average, O(n) worst\n• Delete: O(log n) average, O(n) worst\n\nWould you like me to explain any specific BST operations?',
-    'study plan': 'Here\'s a 2-week study plan for your midterms:\n\n📅 Week 1:\n• Days 1-2: Data Structures (Trees & Graphs)\n• Days 3-4: Database Systems (SQL & Normalization)\n• Days 5-6: Software Engineering (UML & SDLC)\n• Day 7: Review and practice problems\n\n📅 Week 2:\n• Days 8-9: Computer Networks (OSI Model)\n• Days 10-11: Operating Systems (Process Management)\n• Days 12-13: Mock tests and weak area revision\n• Day 14: Final review and relaxation\n\n💡 Tips:\n• Study 2-3 hours daily with breaks\n• Practice past papers\n• Form study groups\n\nWould you like me to detail any specific subject?',
-    'quiz': '📝 Database Normalization Quiz:\n\n1. What is the main purpose of normalization?\na) Increase data redundancy\nb) Reduce data redundancy\nc) Make queries slower\nd) Add more tables\n\n2. Which normal form eliminates partial dependencies?\na) 1NF\nb) 2NF\nc) 3NF\nd) BCNF\n\n3. A table is in 1NF if:\na) It has a primary key\nb) All attributes are atomic\nc) No transitive dependencies\nd) All of the above\n\n4. What is a transitive dependency?\na) A → B and B → C, then A → C\nb) Direct dependency\nc) Partial dependency\nd) None of the above\n\nAnswers: 1-b, 2-b, 3-b, 4-a\n\nWould you like more questions or explanations?',
-    'revision tips': '🎯 Data Structures Revision Tips:\n\n1. **Master the Basics**\n   • Arrays, Linked Lists operations\n   • Time & Space complexity\n\n2. **Visual Learning**\n   • Draw diagrams for trees/graphs\n   • Trace algorithms step-by-step\n\n3. **Practice Coding**\n   • Implement each data structure\n   • Solve LeetCode easy problems\n\n4. **Focus on These Topics**\n   ⭐ Binary Trees (traversals)\n   ⭐ Stack/Queue applications\n   ⭐ Sorting algorithms\n   ⭐ Hash tables\n\n5. **Before Exam**\n   • Review time complexities\n   • Practice past papers\n   • Sleep well\n\nNeed help with any specific topic?'
-  };
+  const handleSendMessage = async () => {
+    if (!inputMessage.trim() || isTyping) return;
 
-  const handleSendMessage = () => {
-    if (!inputMessage.trim()) return;
+    const userMsg = inputMessage;
+    setInputMessage('');
+    setIsTyping(true);
 
     // Add user message
-    const newMessages = [...messages, { role: 'user' as const, content: inputMessage }];
+    const newMessages = [...messages, { role: 'user' as const, content: userMsg }];
     setMessages(newMessages);
 
-    // Generate AI response based on keywords
-    setTimeout(() => {
-      let aiResponse = '';
-      const lowerInput = inputMessage.toLowerCase();
-
-      if (lowerInput.includes('binary search tree') || lowerInput.includes('bst')) {
-        aiResponse = sampleResponses['binary search tree'];
-      } else if (lowerInput.includes('study plan') || lowerInput.includes('midterm')) {
-        aiResponse = sampleResponses['study plan'];
-      } else if (lowerInput.includes('quiz') || lowerInput.includes('normalization')) {
-        aiResponse = sampleResponses['quiz'];
-      } else if (lowerInput.includes('revision') || lowerInput.includes('tips')) {
-        aiResponse = sampleResponses['revision tips'];
-      } else {
-        aiResponse = `Great question! Let me help you with that. As your AI Study Buddy, I can:\n\n✅ Explain complex topics in simple terms\n✅ Create personalized study plans\n✅ Generate practice quizzes\n✅ Provide revision strategies\n✅ Help with exam preparation\n\nTry asking about specific topics from your courses like:\n• "Explain Binary Search Trees"\n• "Help me with SQL queries"\n• "Create a study plan for finals"\n• "Generate a quiz on Operating Systems"\n\nWhat would you like to know?`;
+    try {
+      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+      if (!apiKey || apiKey === 'your_key_here') {
+        throw new Error('API_KEY_MISSING');
       }
 
-      setMessages([...newMessages, { role: 'ai', content: aiResponse }]);
-    }, 500);
+      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
-    setInputMessage('');
+      const prompt = `
+        You are "Study Buddy AI", a helpful assistant for a student at NUTECH university.
+        Student Name: ${user.name}
+        Semester: ${user.semester}
+        Department: Computer Science
+        
+        Guidelines:
+        1. Answer ANY question the user asks. Do not restrict yourself to academic topics.
+        2. Be helpful, friendly, and professional.
+        3. Use markdown for better formatting.
+        
+        Previous Conversation:
+        ${messages.map(m => `${m.role === 'user' ? 'Student' : 'AI'}: ${m.content}`).join('\n')}
+        
+        Current Question: ${userMsg}
+      `;
+
+      const result = await model.generateContent(prompt);
+      const response = await result.response;
+      const text = response.text();
+
+      setMessages([...newMessages, { role: 'ai', content: text }]);
+    } catch (error: any) {
+      console.error('Gemini Error:', error);
+      let errorMessage = "I'm having trouble connecting to my brain right now. Please try again in a moment!";
+
+      if (error.message === 'API_KEY_MISSING') {
+        errorMessage = "⚠️ Gemini API Key is missing. Please get a free API key from https://aistudio.google.com/app/apikey and add it to your .env file as VITE_GEMINI_API_KEY.";
+      }
+
+      setMessages([...newMessages, { role: 'ai', content: errorMessage }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleQuickAction = (prompt: string) => {
@@ -116,11 +139,10 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
                 </div>
               )}
               <div
-                className={`max-w-[80%] rounded-xl px-4 py-3 ${
-                  message.role === 'user'
-                    ? 'bg-green-600 text-white'
-                    : 'bg-gray-100 text-gray-800'
-                }`}
+                className={`max-w-[80%] rounded-xl px-4 py-3 ${message.role === 'user'
+                  ? 'bg-green-600 text-white'
+                  : 'bg-gray-100 text-gray-800'
+                  }`}
               >
                 <p className="text-sm whitespace-pre-line">{message.content}</p>
               </div>
@@ -143,7 +165,7 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder="Ask me anything about your courses..."
+              placeholder="Ask me anything..."
               className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
             />
             <button
