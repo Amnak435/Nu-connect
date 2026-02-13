@@ -27,9 +27,9 @@ export function DateSheet({ user }: DateSheetProps) {
       .select('*')
       .eq('category', 'datesheet')
       .eq('sub_category', examType === 'midterm' ? 'midterm' : 'final')
-      .eq('semester', user.semester)
-      .eq('batch', user.batch || '2024')
-      .or(`section.eq.${user.section},section.eq.All,section.eq.${user.section === 'A' ? 'Alpha' : user.section === 'B' ? 'Beta' : user.section === 'C' ? 'Gamma' : 'Delta'}`)
+      .eq('semester', '4th Semester') // Use 4th Semester as master
+      .eq('batch', '2024')
+      .or(`section.eq.B,section.eq.All`)
       .order('created_at', { ascending: false })
       .limit(1);
 
@@ -41,23 +41,28 @@ export function DateSheet({ user }: DateSheetProps) {
     setLoading(false);
   };
 
-  const midtermExams = [
-    { date: 'Feb 02, 2026', day: 'Monday', time: '09:00 AM - 11:00 AM', course: 'Data Structures', code: 'CS-301', room: 'Exam Hall A' },
-    { date: 'Feb 04, 2026', day: 'Wednesday', time: '09:00 AM - 11:00 AM', course: 'Database Systems', code: 'CS-302', room: 'Exam Hall B' },
-    { date: 'Feb 06, 2026', day: 'Friday', time: '09:00 AM - 11:00 AM', course: 'Software Engineering', code: 'CS-303', room: 'Exam Hall A' },
-    { date: 'Feb 09, 2026', day: 'Monday', time: '02:00 PM - 04:00 PM', course: 'Computer Networks', code: 'CS-304', room: 'Exam Hall C' },
-    { date: 'Feb 11, 2026', day: 'Wednesday', time: '09:00 AM - 11:00 AM', course: 'Operating Systems', code: 'CS-305', room: 'Exam Hall B' },
-  ];
+  const masterExamSchedule = {
+    midterm: [
+      { date: 'Mar 15, 2026', day: 'Monday', time: '09:00-11:00', course: 'Computer Organization & Assembly Language', code: 'CS230', room: 'AC-702B' },
+      { date: 'Mar 17, 2026', day: 'Wednesday', time: '09:00-11:00', course: 'Theory of Automata', code: 'CS212', room: 'AC-702B' },
+      { date: 'Mar 19, 2026', day: 'Friday', time: '09:00-11:00', course: 'Advance Database Management Systems', code: 'CS260', room: 'AC-702B' },
+      { date: 'Mar 21, 2026', day: 'Sunday', time: '09:00-11:00', course: 'Applied Physics', code: 'GE250', room: 'AC-702B' },
+      { date: 'Mar 23, 2026', day: 'Tuesday', time: '02:00-04:00', course: 'Expository Writing', code: 'GE111', room: 'AC-702B' },
+      { date: 'Mar 25, 2026', day: 'Thursday', time: '09:00-11:00', course: 'Islamic Studies', code: 'GE111', room: 'AC-702B' },
+      { date: 'Mar 27, 2026', day: 'Saturday', time: '09:00-11:00', course: 'Linear Algebra (Pre-Med)', code: 'MT110', room: 'AC-702B' }
+    ],
+    final: [
+      { date: 'Jun 15, 2026', day: 'Monday', time: '09:00-12:00', course: 'Computer Organization & Assembly Language', code: 'CS230', room: 'AC-702B' },
+      { date: 'Jun 17, 2026', day: 'Wednesday', time: '09:00-12:00', course: 'Theory of Automata', code: 'CS212', room: 'AC-702B' },
+      { date: 'Jun 19, 2026', day: 'Friday', time: '09:00-12:00', course: 'Advance Database Management Systems', code: 'CS260', room: 'AC-702B' },
+      { date: 'Jun 21, 2026', day: 'Sunday', time: '09:00-12:00', course: 'Applied Physics', code: 'GE250', room: 'AC-702B' },
+      { date: 'Jun 23, 2026', day: 'Tuesday', time: '02:00-05:00', course: 'Expository Writing', code: 'GE111', room: 'AC-702B' },
+      { date: 'Jun 25, 2026', day: 'Thursday', time: '09:00-12:00', course: 'Islamic Studies', code: 'GE111', room: 'AC-702B' },
+      { date: 'Jun 27, 2026', day: 'Saturday', time: '09:00-12:00', course: 'Linear Algebra (Pre-Med)', code: 'MT110', room: 'AC-702B' }
+    ]
+  };
 
-  const finalExams = [
-    { date: 'May 10, 2026', day: 'Sunday', time: '09:00 AM - 12:00 PM', course: 'Data Structures', code: 'CS-301', room: 'Exam Hall A' },
-    { date: 'May 13, 2026', day: 'Wednesday', time: '09:00 AM - 12:00 PM', course: 'Database Systems', code: 'CS-302', room: 'Exam Hall B' },
-    { date: 'May 16, 2026', day: 'Saturday', time: '09:00 AM - 12:00 PM', course: 'Software Engineering', code: 'CS-303', room: 'Exam Hall A' },
-    { date: 'May 19, 2026', day: 'Tuesday', time: '02:00 PM - 05:00 PM', course: 'Computer Networks', code: 'CS-304', room: 'Exam Hall C' },
-    { date: 'May 22, 2026', day: 'Friday', time: '09:00 AM - 12:00 PM', course: 'Operating Systems', code: 'CS-305', room: 'Exam Hall B' },
-  ];
-
-  const exams = examType === 'midterm' ? midtermExams : finalExams;
+  const exams = examType === 'midterm' ? masterExamSchedule.midterm : masterExamSchedule.final;
 
   const getDaysUntilExam = (examDate: string) => {
     const today = new Date('2026-01-21');

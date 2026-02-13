@@ -23,7 +23,7 @@ export function Syllabus({ user }: SyllabusProps) {
       .from('academic_documents')
       .select('*')
       .in('category', ['syllabus', 'lecture'])
-      .eq('semester', user.semester)
+      .eq('semester', '4th Semester') // Use 4th Semester as master
       .eq('batch', user.batch || '2024')
       .order('created_at', { ascending: false });
 
@@ -36,83 +36,90 @@ export function Syllabus({ user }: SyllabusProps) {
     setLoading(false);
   };
 
-  const courses = [
+  const masterCourseList = [
     {
-      code: 'CS-301',
-      name: 'Data Structures',
-      creditHours: 3,
-      topics: [
-        'Arrays and Linked Lists',
-        'Stacks and Queues',
-        'Trees and Binary Search Trees',
-        'Graphs and Traversal Algorithms',
-        'Hashing and Hash Tables',
-        'Sorting and Searching'
-      ],
-      faculty: 'Dr. Sarah Ahmed',
+      code: 'CS230',
+      name: 'Computer Organization & Assembly Language',
+      creditHours: 2,
+      topics: ['ISA', 'Microarchitecture', 'Register Transfer', 'Assembly', 'Memory Hierarchy', 'I/O'],
+      faculty: 'Shanza Zafar',
       examWeightage: { midterm: '30%', final: '50%', assignments: '20%' }
     },
     {
-      code: 'CS-302',
-      name: 'Database Systems',
+      code: 'CS231',
+      name: 'Computer Organization & Assembly Language Lab',
+      creditHours: 1,
+      topics: ['Assembly Programming', 'CPU Simulation', 'Hardware', 'Debuggers', 'Stack', 'Interrupts'],
+      faculty: 'Naveed Ahmed',
+      examWeightage: { labs: '60%', project: '40%' }
+    },
+    {
+      code: 'CS212',
+      name: 'Theory of Automata',
       creditHours: 3,
-      topics: [
-        'Relational Database Design',
-        'SQL Queries and DML',
-        'Normalization (1NF to BCNF)',
-        'Transaction Management',
-        'Indexing and Query Optimization',
-        'NoSQL Databases Introduction'
-      ],
-      faculty: 'Prof. Ali Hassan',
+      topics: ['Finite Automata', 'Regular Expressions', 'CFG', 'PDA', 'Turing Machines', 'Decidability'],
+      faculty: 'Naveed Yousaf',
+      examWeightage: { midterm: '30%', final: '50%', quizzes: '20%' }
+    },
+    {
+      code: 'CS260',
+      name: 'Advance Database Management Systems',
+      creditHours: 2,
+      topics: ['Distributed DB', 'Object-Oriented', 'Warehousing', 'Mining', 'Processing', 'Concurrency'],
+      faculty: 'Rabbiya Younas',
       examWeightage: { midterm: '30%', final: '50%', assignments: '20%' }
     },
     {
-      code: 'CS-303',
-      name: 'Software Engineering',
-      creditHours: 3,
-      topics: [
-        'SDLC Models',
-        'Requirements Engineering',
-        'UML Diagrams',
-        'Software Design Patterns',
-        'Testing Strategies',
-        'Agile Methodologies'
-      ],
-      faculty: 'Dr. Fatima Khan',
-      examWeightage: { midterm: '25%', final: '50%', project: '25%' }
+      code: 'CS261',
+      name: 'Advance Database Management Systems Lab',
+      creditHours: 1,
+      topics: ['Advanced SQL', 'PL/SQL', 'DBA', 'NoSQL', 'Reporting', 'ETL'],
+      faculty: 'Rabbiya Younas',
+      examWeightage: { labs: '60%', project: '40%' }
     },
     {
-      code: 'CS-304',
-      name: 'Computer Networks',
-      creditHours: 3,
-      topics: [
-        'OSI and TCP/IP Models',
-        'IP Addressing and Subnetting',
-        'Routing Protocols',
-        'Transport Layer (TCP/UDP)',
-        'Network Security Basics',
-        'Wireless Networks'
-      ],
-      faculty: 'Dr. Usman Ali',
-      examWeightage: { midterm: '30%', final: '50%', labs: '20%' }
-    },
-    {
-      code: 'CS-305',
-      name: 'Operating Systems',
-      creditHours: 3,
-      topics: [
-        'Process Management',
-        'CPU Scheduling Algorithms',
-        'Memory Management',
-        'Virtual Memory',
-        'File Systems',
-        'Deadlock Prevention'
-      ],
-      faculty: 'Prof. Ayesha Malik',
+      code: 'GE250',
+      name: 'Applied Physics',
+      creditHours: 2,
+      topics: ['Mechanics', 'Thermodynamics', 'EM', 'Optics', 'Modern Physics', 'Solid State'],
+      faculty: 'Dr. KhushBakht',
       examWeightage: { midterm: '30%', final: '50%', assignments: '20%' }
+    },
+    {
+      code: 'GE251',
+      name: 'Applied Physics Lab',
+      creditHours: 1,
+      topics: ['Mechanics', 'Thermodynamics', 'EM', 'Optics', 'Modern Physics', 'Solid State'],
+      faculty: 'Dr. KhushBakht',
+      examWeightage: { labs: '100%' }
+    },
+    {
+      code: 'GE111',
+      name: 'Expository Writing',
+      creditHours: 3,
+      topics: ['Critical Reading', 'Rhetoric', 'Argumentative', 'Research', 'Citation', 'Reviews'],
+      faculty: 'Mehwish',
+      examWeightage: { midterm: '20%', final: '40%', portfolio: '40%' }
+    },
+    {
+      code: 'GE111',
+      name: 'Islamic Studies',
+      creditHours: 2,
+      topics: ['Quranic', 'Seerat', 'Civilization', 'Social System', 'Ethics', 'Human Rights'],
+      faculty: 'Dr. Noushin Iqbal',
+      examWeightage: { midterm: '30%', final: '50%', assignments: '20%' }
+    },
+    {
+      code: 'MT110',
+      name: 'Linear Algebra (Pre-Med)',
+      creditHours: 3,
+      topics: ['Linear Equations', 'Matrices', 'Vector Spaces', 'Transformations', 'Eigenvalues', 'Inward Product'],
+      faculty: 'Maryam Zafar',
+      examWeightage: { midterm: '30%', final: '50%', quizzes: '20%' }
     }
   ];
+
+  const courses = masterCourseList;
 
   const filteredCourses = courses.filter(course =>
     course.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -234,7 +241,7 @@ export function Syllabus({ user }: SyllabusProps) {
                     Topics Covered
                   </h4>
                   <ul className="space-y-2">
-                    {course.topics.map((topic, idx) => (
+                    {course.topics.map((topic: string, idx: number) => (
                       <li key={idx} className="flex items-start gap-2 text-gray-700">
                         <span className="text-green-600 mt-1">•</span>
                         <span className="text-sm">{topic}</span>
@@ -257,10 +264,10 @@ export function Syllabus({ user }: SyllabusProps) {
                           <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
                             <div
                               className="h-full bg-green-600 rounded-full"
-                              style={{ width: value }}
+                              style={{ width: value as string }}
                             />
                           </div>
-                          <span className="text-sm font-bold text-green-600 min-w-[3rem] text-right">{value}</span>
+                          <span className="text-sm font-bold text-green-600 min-w-[3rem] text-right">{value as string}</span>
                         </div>
                       </div>
                     ))}

@@ -47,37 +47,41 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
   const fetchTimetable = async () => {
     setLoading(true);
 
-    // 1. Fetch structured entries specifically for this user's section/batch
+    // 1. Fetch structured entries specifically for 4th Semester Section B (The Master Schedule)
     const { data: entries, error: entryError } = await supabase
       .from('timetable_entries')
       .select('*')
-      .eq('semester', selectedSemester)
-      .eq('batch', user?.batch || '2024')
-      .or(`section.eq.${user?.section},section.eq.All`);
+      .eq('semester', '4th Semester')
+      .eq('batch', '2024')
+      .or(`section.eq.B,section.eq.All`);
 
     if (!entryError && entries && entries.length > 0) {
       const formatted: Record<string, Record<string, ClassSlot[]>> = {};
-      entries.forEach(entry => {
-        if (!formatted[entry.semester]) formatted[entry.semester] = {};
-        if (!formatted[entry.semester][entry.day]) formatted[entry.semester][entry.day] = [];
-        formatted[entry.semester][entry.day].push({
-          time: entry.time_slot,
-          subject: entry.subject,
-          type: entry.type as 'Lecture' | 'Lab',
-          teacher: entry.faculty_name,
-          venue: entry.venue
+
+      // Populate EVERYTHING with this data
+      semesters.forEach(sem => {
+        formatted[sem] = {};
+        entries.forEach(entry => {
+          if (!formatted[sem][entry.day]) formatted[sem][entry.day] = [];
+          formatted[sem][entry.day].push({
+            time: entry.time_slot,
+            subject: entry.subject,
+            type: entry.type as 'Lecture' | 'Lab',
+            teacher: entry.faculty_name,
+            venue: entry.venue
+          });
         });
       });
       setDbSchedules(formatted);
     }
 
-    // 2. Fetch the latest OFFICIAL DOCUMENT for this semester/batch
+    // 2. Fetch the latest OFFICIAL DOCUMENT for 4th Semester
     const { data: docs, error: docError } = await supabase
       .from('academic_documents')
       .select('*')
       .eq('category', 'timetable')
-      .eq('semester', selectedSemester)
-      .eq('batch', user?.batch || '2024')
+      .eq('semester', '4th Semester')
+      .eq('batch', '2024')
       .order('created_at', { ascending: false })
       .limit(1);
 

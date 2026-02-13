@@ -54,6 +54,17 @@ export function AdminPanel() {
         department: 'All Departments'
     });
 
+    // User Form State
+    const [userForm, setUserForm] = useState({
+        full_name: '',
+        nutech_id: '',
+        department: 'Computer Science',
+        batch: '2024',
+        section: 'A',
+        semester: '1st Semester',
+        role: 'student'
+    });
+
     // Timetable/Document Form State
     const [docForm, setDocForm] = useState({
         title: '',
@@ -344,14 +355,15 @@ export function AdminPanel() {
                 {/* Toolbar */}
                 <div className="p-4 border-b flex justify-between items-center">
                     <h3 className="font-bold text-gray-800 capitalize">{activeTab}</h3>
-                    {!isAdding && ['announcements', 'timetable', 'documents', 'fees', 'attendance'].includes(activeTab) && (
+                    {!isAdding && ['announcements', 'timetable', 'documents', 'fees', 'attendance', 'users'].includes(activeTab) && (
                         <button
                             onClick={() => setIsAdding(true)}
                             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
                             {activeTab === 'fees' ? 'Define Fee Structure' :
-                                activeTab === 'attendance' ? 'Import Attendance' : 'Add New'}
+                                activeTab === 'attendance' ? 'Import Attendance' :
+                                    activeTab === 'users' ? 'Add Student Profile' : 'Add New'}
                         </button>
                     )}
                 </div>
