@@ -38,84 +38,60 @@ export function Syllabus({ user }: SyllabusProps) {
 
   const masterCourseList = [
     {
-      code: 'CS230',
-      name: 'Computer Organization & Assembly Language',
-      creditHours: 2,
-      topics: ['ISA', 'Microarchitecture', 'Register Transfer', 'Assembly', 'Memory Hierarchy', 'I/O'],
-      faculty: 'Shanza Zafar',
-      examWeightage: { midterm: '30%', final: '50%', assignments: '20%' }
+      code: 'PHY-201',
+      name: 'Applied Physics',
+      creditHours: 3,
+      topics: ['Mechanics & Motion', 'Waves and Oscillations', 'Electricity & Magnetism', 'Optics and Light', 'Modern Physics Basics'],
+      faculty: 'Dr. Kush Bakht',
+      examWeightage: { midterm: '30%', final: '50%', 'Lab Work': '20%' }
     },
     {
-      code: 'CS231',
-      name: 'Computer Organization & Assembly Language Lab',
-      creditHours: 1,
-      topics: ['Assembly Programming', 'CPU Simulation', 'Hardware', 'Debuggers', 'Stack', 'Interrupts'],
-      faculty: 'Naveed Ahmed',
-      examWeightage: { labs: '60%', project: '40%' }
-    },
-    {
-      code: 'CS212',
+      code: 'CS-212',
       name: 'Theory of Automata',
       creditHours: 3,
-      topics: ['Finite Automata', 'Regular Expressions', 'CFG', 'PDA', 'Turing Machines', 'Decidability'],
+      topics: ['Finite Automata (DFA & NFA)', 'Regular Expressions', 'Context-Free Grammars', 'Pushdown Automata', 'Turing Machines', 'Computability Concepts'],
       faculty: 'Naveed Yousaf',
-      examWeightage: { midterm: '30%', final: '50%', quizzes: '20%' }
+      examWeightage: { midterm: '30%', final: '50%', 'Assignments': '20%' }
     },
     {
-      code: 'CS260',
-      name: 'Advance Database Management Systems',
-      creditHours: 2,
-      topics: ['Distributed DB', 'Object-Oriented', 'Warehousing', 'Mining', 'Processing', 'Concurrency'],
-      faculty: 'Rabbiya Younas',
-      examWeightage: { midterm: '30%', final: '50%', assignments: '20%' }
-    },
-    {
-      code: 'CS261',
-      name: 'Advance Database Management Systems Lab',
-      creditHours: 1,
-      topics: ['Advanced SQL', 'PL/SQL', 'DBA', 'NoSQL', 'Reporting', 'ETL'],
-      faculty: 'Rabbiya Younas',
-      examWeightage: { labs: '60%', project: '40%' }
-    },
-    {
-      code: 'GE250',
-      name: 'Applied Physics',
-      creditHours: 2,
-      topics: ['Mechanics', 'Thermodynamics', 'EM', 'Optics', 'Modern Physics', 'Solid State'],
-      faculty: 'Dr. KhushBakht',
-      examWeightage: { midterm: '30%', final: '50%', assignments: '20%' }
-    },
-    {
-      code: 'GE251',
-      name: 'Applied Physics Lab',
-      creditHours: 1,
-      topics: ['Mechanics', 'Thermodynamics', 'EM', 'Optics', 'Modern Physics', 'Solid State'],
-      faculty: 'Dr. KhushBakht',
-      examWeightage: { labs: '100%' }
-    },
-    {
-      code: 'GE111',
-      name: 'Expository Writing',
+      code: 'CH-230',
+      name: 'Coal (Lab + Theory)',
       creditHours: 3,
-      topics: ['Critical Reading', 'Rhetoric', 'Argumentative', 'Research', 'Citation', 'Reviews'],
-      faculty: 'Mehwish',
-      examWeightage: { midterm: '20%', final: '40%', portfolio: '40%' }
+      topics: ['Coal Formation & Types', 'Industrial Uses of Coal', 'Carbonization Process', 'Fuel Efficiency & Combustion', 'Environmental Impact'],
+      faculty: 'Naveed Ahmed',
+      examWeightage: { midterm: '25%', final: '50%', 'Lab Reports': '25%' }
     },
     {
-      code: 'GE111',
-      name: 'Islamic Studies',
-      creditHours: 2,
-      topics: ['Quranic', 'Seerat', 'Civilization', 'Social System', 'Ethics', 'Human Rights'],
-      faculty: 'Dr. Noushin Iqbal',
-      examWeightage: { midterm: '30%', final: '50%', assignments: '20%' }
+      code: 'CS-220',
+      name: 'Advanced Discrete Mathematical Structures (DMS)',
+      creditHours: 3,
+      topics: ['Propositional & Predicate Logic', 'Set Theory', 'Relations & Functions', 'Graph Theory', 'Combinatorics', 'Recurrence Relations'],
+      faculty: 'TBA',
+      examWeightage: { midterm: '30%', final: '50%', 'Assignments': '20%' }
     },
     {
-      code: 'MT110',
+      code: 'MTH-210',
       name: 'Linear Algebra (Pre-Med)',
       creditHours: 3,
-      topics: ['Linear Equations', 'Matrices', 'Vector Spaces', 'Transformations', 'Eigenvalues', 'Inward Product'],
-      faculty: 'Maryam Zafar',
-      examWeightage: { midterm: '30%', final: '50%', quizzes: '20%' }
+      topics: ['Matrices & Determinants', 'Systems of Linear Equations', 'Vector Spaces', 'Eigenvalues & Eigenvectors', 'Linear Transformations'],
+      faculty: 'TBA',
+      examWeightage: { midterm: '30%', final: '50%', 'Quizzes': '20%' }
+    },
+    {
+      code: 'ENG-201',
+      name: 'Expository Writing',
+      creditHours: 3,
+      topics: ['Academic Writing Skills', 'Essay Structure', 'Argument Development', 'Research & Citation', 'Critical Analysis'],
+      faculty: 'Mehwish',
+      examWeightage: { midterm: '25%', final: '40%', 'Assignments': '35%' }
+    },
+    {
+      code: 'ISL-201',
+      name: 'Islamic Studies',
+      creditHours: 2,
+      topics: ['Islamic History', 'Ethics & Moral Philosophy', 'Quranic Studies', 'Contemporary Issues in Islam', 'Islamic Civilization'],
+      faculty: 'TBA',
+      examWeightage: { midterm: '30%', final: '50%', 'Presentations': '20%' }
     }
   ];
 

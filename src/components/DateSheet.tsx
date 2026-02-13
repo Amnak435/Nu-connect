@@ -43,22 +43,22 @@ export function DateSheet({ user }: DateSheetProps) {
 
   const masterExamSchedule = {
     midterm: [
-      { date: 'Mar 15, 2026', day: 'Monday', time: '09:00-11:00', course: 'Computer Organization & Assembly Language', code: 'CS230', room: 'AC-702B' },
-      { date: 'Mar 17, 2026', day: 'Wednesday', time: '09:00-11:00', course: 'Theory of Automata', code: 'CS212', room: 'AC-702B' },
-      { date: 'Mar 19, 2026', day: 'Friday', time: '09:00-11:00', course: 'Advance Database Management Systems', code: 'CS260', room: 'AC-702B' },
-      { date: 'Mar 21, 2026', day: 'Sunday', time: '09:00-11:00', course: 'Applied Physics', code: 'GE250', room: 'AC-702B' },
-      { date: 'Mar 23, 2026', day: 'Tuesday', time: '02:00-04:00', course: 'Expository Writing', code: 'GE111', room: 'AC-702B' },
-      { date: 'Mar 25, 2026', day: 'Thursday', time: '09:00-11:00', course: 'Islamic Studies', code: 'GE111', room: 'AC-702B' },
-      { date: 'Mar 27, 2026', day: 'Saturday', time: '09:00-11:00', course: 'Linear Algebra (Pre-Med)', code: 'MT110', room: 'AC-702B' }
+      { date: 'Feb 03, 2026', day: 'Tuesday', time: '09:00 AM - 11:00 AM', course: 'Applied Physics', code: 'PHY-201', room: 'Exam Hall A' },
+      { date: 'Feb 05, 2026', day: 'Thursday', time: '09:00 AM - 11:00 AM', course: 'Theory of Automata', code: 'CS-212', room: 'Exam Hall B' },
+      { date: 'Feb 07, 2026', day: 'Saturday', time: '09:00 AM - 11:00 AM', course: 'Coal (Theory)', code: 'CH-230', room: 'Exam Hall C' },
+      { date: 'Feb 09, 2026', day: 'Monday', time: '02:00 PM - 04:00 PM', course: 'Advanced DMS', code: 'CS-220', room: 'Exam Hall A' },
+      { date: 'Feb 11, 2026', day: 'Wednesday', time: '09:00 AM - 11:00 AM', course: 'Linear Algebra', code: 'MTH-210', room: 'Exam Hall B' },
+      { date: 'Feb 13, 2026', day: 'Friday', time: '09:00 AM - 11:00 AM', course: 'Expository Writing', code: 'ENG-201', room: 'Exam Hall C' },
+      { date: 'Feb 15, 2026', day: 'Sunday', time: '09:00 AM - 11:00 AM', course: 'Islamic Studies', code: 'ISL-201', room: 'Hall TBA' }
     ],
     final: [
-      { date: 'Jun 15, 2026', day: 'Monday', time: '09:00-12:00', course: 'Computer Organization & Assembly Language', code: 'CS230', room: 'AC-702B' },
-      { date: 'Jun 17, 2026', day: 'Wednesday', time: '09:00-12:00', course: 'Theory of Automata', code: 'CS212', room: 'AC-702B' },
-      { date: 'Jun 19, 2026', day: 'Friday', time: '09:00-12:00', course: 'Advance Database Management Systems', code: 'CS260', room: 'AC-702B' },
-      { date: 'Jun 21, 2026', day: 'Sunday', time: '09:00-12:00', course: 'Applied Physics', code: 'GE250', room: 'AC-702B' },
-      { date: 'Jun 23, 2026', day: 'Tuesday', time: '02:00-05:00', course: 'Expository Writing', code: 'GE111', room: 'AC-702B' },
-      { date: 'Jun 25, 2026', day: 'Thursday', time: '09:00-12:00', course: 'Islamic Studies', code: 'GE111', room: 'AC-702B' },
-      { date: 'Jun 27, 2026', day: 'Saturday', time: '09:00-12:00', course: 'Linear Algebra (Pre-Med)', code: 'MT110', room: 'AC-702B' }
+      { date: 'May 12, 2026', day: 'Tuesday', time: '09:00 AM - 12:00 PM', course: 'Applied Physics', code: 'PHY-201', room: 'Exam Hall A' },
+      { date: 'May 15, 2026', day: 'Friday', time: '09:00 AM - 12:00 PM', course: 'Theory of Automata', code: 'CS-212', room: 'Exam Hall B' },
+      { date: 'May 18, 2026', day: 'Monday', time: '09:00 AM - 12:00 PM', course: 'Coal', code: 'CH-230', room: 'Exam Hall C' },
+      { date: 'May 21, 2026', day: 'Thursday', time: '02:00 PM - 05:00 PM', course: 'Advanced DMS', code: 'CS-220', room: 'Exam Hall A' },
+      { date: 'May 24, 2026', day: 'Sunday', time: '09:00 AM - 12:00 PM', course: 'Linear Algebra', code: 'MTH-210', room: 'Exam Hall B' },
+      { date: 'May 27, 2026', day: 'Wednesday', time: '09:00 AM - 12:00 PM', course: 'Expository Writing', code: 'ENG-201', room: 'Exam Hall C' },
+      { date: 'May 29, 2026', day: 'Friday', time: '09:00 AM - 12:00 PM', course: 'Islamic Studies', code: 'ISL-201', room: 'Hall TBA' }
     ]
   };
 
