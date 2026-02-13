@@ -761,52 +761,63 @@ export function AdminPanel() {
                                                 <div className="text-sm text-gray-600 max-w-md truncate">
                                                     {activeTab === 'announcements' ? item.message :
                                                         activeTab === 'users' ? `${item.department} | ${item.batch}` :
-                                                            activeTab === 'fees' ? (
-                                                                <div className="flex items-center gap-3">
-                                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold ${item.status === 'verified' ? 'bg-green-100 text-green-700' :
-                                                                        item.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                                                                            'bg-yellow-100 text-yellow-700'
-                                                                        }`}>
-                                                                        {item.status || 'pending'}
+                                                            activeTab === 'documents' || activeTab === 'timetable' ? (
+                                                                <div className="flex flex-col">
+                                                                    <span className="font-semibold text-gray-700">{item.subject || item.title}</span>
+                                                                    <span className="text-xs text-gray-500">
+                                                                        {item.semester} • {item.batch} • Sec {item.section}
                                                                     </span>
-                                                                    <a href={item.file_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">View Proof</a>
+                                                                    <span className="text-[10px] uppercase tracking-wider text-green-600 font-bold mt-1">
+                                                                        {item.category} {item.sub_category ? `(${item.sub_category})` : ''}
+                                                                    </span>
                                                                 </div>
                                                             ) :
-                                                                activeTab === 'complaints' ? (
-                                                                    <div className="flex flex-col gap-1">
-                                                                        <div className="flex items-center gap-2">
-                                                                            <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${item.status === 'resolved' ? 'bg-green-100 text-green-700' :
-                                                                                item.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
-                                                                                    'bg-yellow-100 text-yellow-700'
-                                                                                }`}>
-                                                                                {item.status || 'pending'}
-                                                                            </span>
-                                                                            <span className="text-xs font-medium text-purple-600">{item.category}</span>
-                                                                        </div>
-                                                                        <p className="line-clamp-1">{item.description}</p>
-                                                                        {item.response && <p className="text-[10px] text-green-600 font-medium italic">Resp: {item.response}</p>}
+                                                                activeTab === 'fees' ? (
+                                                                    <div className="flex items-center gap-3">
+                                                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${item.status === 'verified' ? 'bg-green-100 text-green-700' :
+                                                                            item.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                                                                'bg-yellow-100 text-yellow-700'
+                                                                            }`}>
+                                                                            {item.status || 'pending'}
+                                                                        </span>
+                                                                        <a href={item.file_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">View Proof</a>
                                                                     </div>
                                                                 ) :
-                                                                    activeTab === 'attendance' ? (
-                                                                        <div className="flex items-center gap-4">
-                                                                            <div className="flex-1 max-w-[150px]">
-                                                                                <div className="flex justify-between text-[10px] mb-1">
-                                                                                    <span className="font-bold">{item.course_name}</span>
-                                                                                    <span>{Math.round((item.attended_classes / item.total_classes) * 100)}%</span>
-                                                                                </div>
-                                                                                <div className="w-full bg-gray-200 rounded-full h-1.5">
-                                                                                    <div
-                                                                                        className={`h-1.5 rounded-full ${item.attended_classes / item.total_classes < 0.75 ? 'bg-red-500' : 'bg-green-500'}`}
-                                                                                        style={{ width: `${(item.attended_classes / item.total_classes) * 100}%` }}
-                                                                                    />
-                                                                                </div>
+                                                                    activeTab === 'complaints' ? (
+                                                                        <div className="flex flex-col gap-1">
+                                                                            <div className="flex items-center gap-2">
+                                                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${item.status === 'resolved' ? 'bg-green-100 text-green-700' :
+                                                                                    item.status === 'in_progress' ? 'bg-blue-100 text-blue-700' :
+                                                                                        'bg-yellow-100 text-yellow-700'
+                                                                                    }`}>
+                                                                                    {item.status || 'pending'}
+                                                                                </span>
+                                                                                <span className="text-xs font-medium text-purple-600">{item.category}</span>
                                                                             </div>
-                                                                            <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
-                                                                                {item.attended_classes}/{item.total_classes} Classes
-                                                                            </span>
+                                                                            <p className="line-clamp-1">{item.description}</p>
+                                                                            {item.response && <p className="text-[10px] text-green-600 font-medium italic">Resp: {item.response}</p>}
                                                                         </div>
                                                                     ) :
-                                                                        activeTab === 'timetable' ? `${item.day} at ${item.time_slot} in ${item.venue}` : item.description}
+                                                                        activeTab === 'attendance' ? (
+                                                                            <div className="flex items-center gap-4">
+                                                                                <div className="flex-1 max-w-[150px]">
+                                                                                    <div className="flex justify-between text-[10px] mb-1">
+                                                                                        <span className="font-bold">{item.course_name}</span>
+                                                                                        <span>{Math.round((item.attended_classes / item.total_classes) * 100)}%</span>
+                                                                                    </div>
+                                                                                    <div className="w-full bg-gray-200 rounded-full h-1.5">
+                                                                                        <div
+                                                                                            className={`h-1.5 rounded-full ${item.attended_classes / item.total_classes < 0.75 ? 'bg-red-500' : 'bg-green-500'}`}
+                                                                                            style={{ width: `${(item.attended_classes / item.total_classes) * 100}%` }}
+                                                                                        />
+                                                                                    </div>
+                                                                                </div>
+                                                                                <span className="text-xs text-gray-500 font-medium whitespace-nowrap">
+                                                                                    {item.attended_classes}/{item.total_classes} Classes
+                                                                                </span>
+                                                                            </div>
+                                                                        ) :
+                                                                            activeTab === 'timetable' ? `${item.day} at ${item.time_slot} in ${item.venue}` : item.description}
                                                 </div>
                                             </td>
                                             <td className="px-6 py-4 text-right">
