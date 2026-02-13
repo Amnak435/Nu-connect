@@ -10,6 +10,7 @@ import { Announcements } from './components/Announcements';
 import { Fees } from './components/Fees';
 import { Complaints } from './components/Complaints';
 import { Login } from './components/Login';
+import GeminiTest from './components/GeminiTest';
 import { supabase } from './lib/supabase';
 import {
   LayoutDashboard,
@@ -132,6 +133,7 @@ export default function App() {
     { id: 'announcements', label: 'Announcements', icon: Megaphone },
     { id: 'fees', label: 'Fees & Payments', icon: CreditCard },
     { id: 'complaints', label: 'Complaints', icon: MessageSquare },
+    { id: 'test-api', label: 'Test API', icon: Bot },
   ];
 
   // Add Admin Panel item for admins or owner
@@ -163,6 +165,8 @@ export default function App() {
         return <Complaints user={currentUser} />;
       case 'admin-panel':
         return <AdminPanel />;
+      case 'test-api':
+        return <GeminiTest />;
       default:
         return <Dashboard user={currentUser} />;
     }
