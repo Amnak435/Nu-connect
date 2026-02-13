@@ -297,7 +297,11 @@ export function ClassroomSync({ user }: ClassroomSyncProps) {
             <div className="w-12 h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-3">
               <CheckCircle className="w-6 h-6 text-green-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">88.6%</p>
+            <p className="text-3xl font-bold text-gray-800">
+              {attendanceData.length > 0
+                ? (attendanceData.reduce((acc, curr) => acc + curr.percentage, 0) / attendanceData.length).toFixed(1)
+                : '0'}%
+            </p>
             <p className="text-sm text-gray-600 mt-1">Avg Attendance</p>
           </div>
         </div>
@@ -307,7 +311,9 @@ export function ClassroomSync({ user }: ClassroomSyncProps) {
             <div className="w-12 h-12 bg-orange-50 rounded-full flex items-center justify-center mx-auto mb-3">
               <Clock className="w-6 h-6 text-orange-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">3</p>
+            <p className="text-3xl font-bold text-gray-800">
+              {assignments.filter(a => a.status === 'pending').length}
+            </p>
             <p className="text-sm text-gray-600 mt-1">Pending Tasks</p>
           </div>
         </div>
@@ -317,7 +323,7 @@ export function ClassroomSync({ user }: ClassroomSyncProps) {
             <div className="w-12 h-12 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-3">
               <FileText className="w-6 h-6 text-purple-600" />
             </div>
-            <p className="text-3xl font-bold text-gray-800">15</p>
+            <p className="text-3xl font-bold text-gray-800">{lectureMaterials.length}</p>
             <p className="text-sm text-gray-600 mt-1">Materials Available</p>
           </div>
         </div>
