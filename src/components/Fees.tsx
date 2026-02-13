@@ -99,7 +99,8 @@ export function Fees({ user }: { user: any }) {
                     nutech_id: nutechId,
                     semester: user.semester,
                     batch: user.batch || '2024',
-                    amount: feeStructure?.amount || 0,
+                    section: user.section || 'N/A',
+                    amount: feeStructure?.amount || 85000,
                     file_url: publicUrl,
                     status: 'pending'
                 }]);

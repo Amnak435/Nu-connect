@@ -34,6 +34,7 @@ export function AdminPanel() {
     const [uploading, setUploading] = useState(false);
 
     // Fee Form State
+    const [feeSubTab, setFeeSubTab] = useState<'submissions' | 'structures'>('submissions');
     const [feeForm, setFeeForm] = useState({
         semester: '1st Semester',
         batch: '2024',
@@ -105,8 +106,12 @@ export function AdminPanel() {
                 query = supabase.from('student_profiles').select('*');
                 break;
             case 'fees':
-                // In fees mode, we might want to see two types of data, let's show Submissions by default
-                query = supabase.from('fee_submissions').select('*').order('created_at', { ascending: false });
+                // In fees mode, switch between submissions and defined structures
+                if (feeSubTab === 'structures') {
+                    query = supabase.from('fee_structures').select('*').order('created_at', { ascending: false });
+                } else {
+                    query = supabase.from('fee_submissions').select('*').order('created_at', { ascending: false });
+                }
                 break;
             case 'complaints':
                 query = supabase.from('complaints').select('*').order('created_at', { ascending: false });
@@ -130,15 +135,24 @@ export function AdminPanel() {
     const handleCreateFeeStructure = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
-        const { error } = await supabase.from('fee_structures').insert([feeForm]);
-        if (error) {
-            toast.error('Error creating fee structure');
-        } else {
-            toast.success('Fee structure defined successfully!');
-            setIsAdding(false);
-            fetchData();
+        console.log('Creating fee structure with data:', feeForm);
+
+        try {
+            const { error } = await supabase.from('fee_structures').insert([feeForm]);
+            if (error) {
+                console.error('Supabase error:', error);
+                toast.error(`Error: ${error.message}`);
+            } else {
+                toast.success('Fee structure defined successfully!');
+                setIsAdding(false);
+                fetchData();
+            }
+        } catch (err: any) {
+            console.error('Unexpected error:', err);
+            toast.error(`Unexpected error: ${err.message}`);
+        } finally {
+            setLoading(false);
         }
-        setLoading(false);
     };
 
     const handleAttendanceImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -353,11 +367,32 @@ export function AdminPanel() {
             {/* Content Area */}
             <div className="bg-white rounded-xl shadow-sm border border-gray-100 min-h-[400px]">
                 {/* Toolbar */}
-                <div className="p-4 border-b flex justify-between items-center">
-                    <h3 className="font-bold text-gray-800 capitalize">{activeTab}</h3>
+                <div className="p-4 border-b flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div className="flex items-center gap-4">
+                        <h3 className="font-bold text-gray-800 capitalize">{activeTab}</h3>
+                        {activeTab === 'fees' && !isAdding && (
+                            <div className="flex bg-gray-100 p-1 rounded-lg">
+                                <button
+                                    onClick={() => { setFeeSubTab('submissions'); fetchData(); }}
+                                    className={`px-3 py-1 rounded-md text-xs font-semibold ${feeSubTab === 'submissions' ? 'bg-white shadow-sm text-green-700' : 'text-gray-500'}`}
+                                >
+                                    Submissions
+                                </button>
+                                <button
+                                    onClick={() => { setFeeSubTab('structures'); fetchData(); }}
+                                    className={`px-3 py-1 rounded-md text-xs font-semibold ${feeSubTab === 'structures' ? 'bg-white shadow-sm text-green-700' : 'text-gray-500'}`}
+                                >
+                                    Structures
+                                </button>
+                            </div>
+                        )}
+                    </div>
                     {!isAdding && ['announcements', 'timetable', 'documents', 'fees', 'attendance', 'users'].includes(activeTab) && (
                         <button
-                            onClick={() => setIsAdding(true)}
+                            onClick={() => {
+                                setIsAdding(true);
+                                if (activeTab === 'fees') setFeeSubTab('structures'); // Switch to structures when adding
+                            }}
                             className="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
                         >
                             <Plus className="w-4 h-4" />
@@ -757,14 +792,14 @@ export function AdminPanel() {
                                                     {activeTab === 'announcements' ? item.title :
                                                         activeTab === 'users' ? item.full_name :
                                                             activeTab === 'attendance' ? item.student_name :
-                                                                activeTab === 'fees' ? item.full_name || item.nutech_id :
+                                                                activeTab === 'fees' ? (feeSubTab === 'structures' ? `${item.semester} Structure` : (item.full_name || item.nutech_id)) :
                                                                     activeTab === 'timetable' ? item.subject :
                                                                         activeTab === 'complaints' ? item.subject : item.title}
                                                 </p>
                                                 <p className="text-xs text-gray-500">
                                                     {activeTab === 'users' ? item.nutech_id :
                                                         activeTab === 'attendance' ? item.student_id :
-                                                            activeTab === 'fees' ? `Amount: Rs. ${item.amount}` :
+                                                            activeTab === 'fees' ? (feeSubTab === 'structures' ? `Batch: ${item.batch}` : `Amount: Rs. ${item.amount}`) :
                                                                 activeTab === 'complaints' ? `From: ${item.student_name || 'Anonymous'}` :
                                                                     item.created_at?.split('T')[0]}
                                                 </p>
@@ -785,15 +820,22 @@ export function AdminPanel() {
                                                                 </div>
                                                             ) :
                                                                 activeTab === 'fees' ? (
-                                                                    <div className="flex items-center gap-3">
-                                                                        <span className={`px-2 py-1 rounded-full text-xs font-bold ${item.status === 'verified' ? 'bg-green-100 text-green-700' :
-                                                                            item.status === 'rejected' ? 'bg-red-100 text-red-700' :
-                                                                                'bg-yellow-100 text-yellow-700'
-                                                                            }`}>
-                                                                            {item.status || 'pending'}
-                                                                        </span>
-                                                                        <a href={item.file_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">View Proof</a>
-                                                                    </div>
+                                                                    feeSubTab === 'structures' ? (
+                                                                        <div className="flex items-center gap-4">
+                                                                            <span className="font-bold text-green-700">Rs. {item.amount?.toLocaleString()}</span>
+                                                                            <span className="text-xs text-gray-500">Due: {item.due_date}</span>
+                                                                        </div>
+                                                                    ) : (
+                                                                        <div className="flex items-center gap-3">
+                                                                            <span className={`px-2 py-1 rounded-full text-xs font-bold ${item.status === 'verified' ? 'bg-green-100 text-green-700' :
+                                                                                item.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                                                                    'bg-yellow-100 text-yellow-700'
+                                                                                }`}>
+                                                                                {item.status || 'pending'}
+                                                                            </span>
+                                                                            <a href={item.file_url} target="_blank" rel="noreferrer" className="text-blue-600 underline">View Proof</a>
+                                                                        </div>
+                                                                    )
                                                                 ) :
                                                                     activeTab === 'complaints' ? (
                                                                         <div className="flex flex-col gap-1">
@@ -847,51 +889,48 @@ export function AdminPanel() {
                                                             <Edit3 className="w-4 h-4" />
                                                         </button>
                                                     )}
-                                                    {activeTab === 'fees' && item.status === 'pending' && (
-                                                        <>
+                                                    {activeTab === 'fees' && feeSubTab === 'submissions' && item.status === 'pending' && (
+                                                        <div className="flex gap-1">
                                                             <button
                                                                 onClick={() => handleVerifyFee(item.id, 'verified')}
-                                                                className="p-2 text-green-600 hover:bg-green-50 rounded-lg"
+                                                                className="p-1 px-2 bg-green-100 text-green-700 rounded text-[10px] font-bold"
                                                             >
-                                                                <CheckCircle className="w-4 h-4" />
+                                                                Verify
                                                             </button>
                                                             <button
                                                                 onClick={() => handleVerifyFee(item.id, 'rejected')}
-                                                                className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                                                                className="p-1 px-2 bg-red-100 text-red-700 rounded text-[10px] font-bold"
                                                             >
-                                                                <X className="w-4 h-4" />
+                                                                Reject
                                                             </button>
-                                                        </>
+                                                        </div>
                                                     )}
-                                                    {activeTab !== 'fees' && activeTab !== 'complaints' && activeTab !== 'attendance' && (
-                                                        <button className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg">
-                                                            <Edit3 className="w-4 h-4" />
+                                                    {(activeTab !== 'fees' || feeSubTab === 'structures') && activeTab !== 'complaints' && (
+                                                        <button
+                                                            onClick={() => handleDelete(item.id,
+                                                                activeTab === 'announcements' ? 'announcements' :
+                                                                    activeTab === 'timetable' ? 'academic_documents' :
+                                                                        activeTab === 'documents' ? 'academic_documents' :
+                                                                            activeTab === 'users' ? 'student_profiles' :
+                                                                                activeTab === 'fees' ? 'fee_structures' :
+                                                                                    activeTab === 'attendance' ? 'attendance' : ''
+                                                            )}
+                                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
+                                                            title="Delete"
+                                                        >
+                                                            <Trash2 className="w-4 h-4" />
                                                         </button>
                                                     )}
-                                                    <button
-                                                        onClick={() => handleDelete(item.id,
-                                                            activeTab === 'users' ? 'student_profiles' :
-                                                                activeTab === 'announcements' ? 'announcements' :
-                                                                    activeTab === 'timetable' ? 'timetable_entries' :
-                                                                        activeTab === 'fees' ? 'fee_submissions' :
-                                                                            activeTab === 'complaints' ? 'complaints' :
-                                                                                activeTab === 'attendance' ? 'attendance' :
-                                                                                    'academic_documents'
-                                                        )}
-                                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg"
-                                                    >
-                                                        <Trash2 className="w-4 h-4" />
-                                                    </button>
                                                 </div>
                                             </td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
-                        )}
-                    </div>
+                        </div>
                 )}
             </div>
+        </div>
         </div >
     );
 }
