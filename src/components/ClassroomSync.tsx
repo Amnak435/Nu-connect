@@ -49,7 +49,7 @@ export function ClassroomSync({ user }: ClassroomSyncProps) {
       .eq('category', 'lecture')
       .eq('semester', user.semester)
       .eq('batch', user.batch || '2024')
-      .or(`section.eq.${user.section},section.eq.All`)
+      .or(`section.eq.${user.section || 'A'},section.eq.All`)
       .order('created_at', { ascending: false });
 
     if (!error && data) {
