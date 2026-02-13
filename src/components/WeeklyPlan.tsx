@@ -2,16 +2,10 @@ import { useState, useMemo, useEffect } from 'react';
 import { Calendar, Clock, MapPin, BookOpen, FlaskConical, User as UserIcon, Loader2, FileText, Upload } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
-interface WeeklyPlanProps {
-  user: any;
-}
+import { User, ClassSlot, AcademicDocument } from '../types';
 
-interface ClassSlot {
-  time: string;
-  subject: string;
-  type: 'Lecture' | 'Lab';
-  teacher?: string;
-  venue?: string;
+interface WeeklyPlanProps {
+  user: User;
 }
 
 // Default Fallback Data
@@ -44,7 +38,7 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
   const [selectedSemester, setSelectedSemester] = useState(user?.semester || '2nd Semester');
   const [dbSchedules, setDbSchedules] = useState<Record<string, Record<string, ClassSlot[]>>>({});
   const [loading, setLoading] = useState(true);
-  const [currentDoc, setCurrentDoc] = useState<any>(null);
+  const [currentDoc, setCurrentDoc] = useState<AcademicDocument | null>(null);
 
   useEffect(() => {
     fetchTimetable();
@@ -88,7 +82,7 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
       .limit(1);
 
     if (!docError && docs && docs.length > 0) {
-      setCurrentDoc(docs[0]);
+      setCurrentDoc(docs[0] as AcademicDocument);
     } else {
       setCurrentDoc(null);
     }

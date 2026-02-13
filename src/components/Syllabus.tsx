@@ -1,15 +1,16 @@
 import { useState, useEffect } from 'react';
 import { BookOpen, Download, FileText, Search, Loader2, Upload } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { User, AcademicDocument } from '../types';
 
 interface SyllabusProps {
-  user: any;
+  user: User;
 }
 
 export function Syllabus({ user }: SyllabusProps) {
   const [searchQuery, setSearchQuery] = useState('');
-  const [syllabusDocs, setSyllabusDocs] = useState<any[]>([]);
-  const [currentDoc, setCurrentDoc] = useState<any>(null);
+  const [syllabusDocs, setSyllabusDocs] = useState<AcademicDocument[]>([]);
+  const [currentDoc, setCurrentDoc] = useState<AcademicDocument | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -27,10 +28,10 @@ export function Syllabus({ user }: SyllabusProps) {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setSyllabusDocs(data);
+      setSyllabusDocs(data as AcademicDocument[]);
       // Main generic doc is the one without a specific subject
-      const generic = data.find(d => !d.subject);
-      setCurrentDoc(generic || data[0]);
+      const generic = (data as AcademicDocument[]).find(d => !d.subject);
+      setCurrentDoc(generic || (data[0] as AcademicDocument));
     }
     setLoading(false);
   };

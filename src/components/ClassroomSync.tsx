@@ -2,14 +2,16 @@ import { useState, useEffect } from 'react';
 import { Users, FileText, Calendar, CheckCircle, Clock, Download, ExternalLink, Loader2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
+import { User, AcademicDocument, AttendanceRecord } from '../types';
+
 interface ClassroomSyncProps {
-  user: any;
+  user: User;
 }
 
 export function ClassroomSync({ user }: ClassroomSyncProps) {
-  const [lectureMaterials, setLectureMaterials] = useState<any[]>([]);
+  const [lectureMaterials, setLectureMaterials] = useState<AcademicDocument[]>([]);
   const [loading, setLoading] = useState(true);
-  const [attendanceData, setAttendanceData] = useState<any[]>([]);
+  const [attendanceData, setAttendanceData] = useState<AttendanceRecord[]>([]);
   const [attendanceLoading, setAttendanceLoading] = useState(true);
 
   useEffect(() => {
@@ -19,7 +21,7 @@ export function ClassroomSync({ user }: ClassroomSyncProps) {
 
   const fetchAttendance = async () => {
     setAttendanceLoading(true);
-    const userId = user.registrationNo || user.nutech_id;
+    const userId = user.registrationNo;
     if (!userId) {
       setAttendanceLoading(false);
       return;
@@ -53,7 +55,7 @@ export function ClassroomSync({ user }: ClassroomSyncProps) {
       .order('created_at', { ascending: false });
 
     if (!error && data) {
-      setLectureMaterials(data);
+      setLectureMaterials(data as AcademicDocument[]);
     }
     setLoading(false);
   };

@@ -1,11 +1,26 @@
+# NUConnect — Your Digital Campus
 
-  # Centralized Student Portal
+NUConnect is a premium, real-time student portal designed specifically for the **National University of Technology (NUTECH)** Computer Science department. It provides an all-in-one digital ecosystem for managing academic life with precision and style.
 
-  This is a code bundle for Centralized Student Portal. The original project is available at https://www.figma.com/design/nbnrXhK4GaKF0ptWzMehdn/Centralized-Student-Portal.
+## 🚀 Key Features
+- **Intelligent Dashboard:** Real-time summary of student progress and university updates.
+- **Dynamic Timetable:** Section-specific schedules with automated "Today" tracking.
+- **Classroom Sync:** Integrated attendance tracking (with 75% risk alerts) and material management.
+- **Study Buddy AI:** A custom-tuned AI assistant for academic queries.
+- **Admin Control:** Secure management of timetables, documents, and student data via dedicated portals.
 
-  ## Running the code
+## 🛠️ Technology Stack
+- **Frontend:** React + Vite
+- **Styling:** Tailwind CSS + Lucide Icons
+- **Backend:** Supabase (Auth, DB, Storage)
+- **AI Engine:** Google Gemini Pro
 
-  Run `npm i` to install the dependencies.
+## 📈 Architecture & Design
+Built with a modular component-driven architecture and a "World-Class" UI/UX approach, emphasizing:
+- **Scalability:** Centralized TypeScript definitions and modular state management.
+- **Security:** Granular Row-Level Security (RLS) policies.
+- **Accessibility:** 100% responsive design for seamless mobile/desktop transitions.
 
-  Run `npm run dev` to start the development server.
-  
+---
+**Authored & Developed by Amna Khurram**  
+*Computer Science 2024 Batch | NUTECH*
