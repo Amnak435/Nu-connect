@@ -43,6 +43,8 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
         throw new Error('API_KEY_MISSING');
       }
 
+      // Initialize API client here to ensure we have the key
+      const genAI = new GoogleGenerativeAI(apiKey);
       const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
       const prompt = `
@@ -69,10 +71,13 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
       setMessages([...newMessages, { role: 'ai', content: text }]);
     } catch (error: any) {
       console.error('Gemini Error:', error);
-      let errorMessage = "I'm having trouble connecting to my brain right now. Please try again in a moment!";
+
+      let errorMessage = `I'm having trouble connecting to my brain right now. (Error: ${error.message})`;
 
       if (error.message === 'API_KEY_MISSING') {
-        errorMessage = "⚠️ Gemini API Key is missing. Please get a free API key from https://aistudio.google.com/app/apikey and add it to your .env file as VITE_GEMINI_API_KEY.";
+        errorMessage = "⚠️ Gemini API Key is missing. Please add VITE_GEMINI_API_KEY to your Vercel Environment Variables.";
+      } else if (error.message.includes('404')) {
+        errorMessage = "⚠️ Error 404: The AI model is currently unavailable. Please try again later.";
       }
 
       setMessages([...newMessages, { role: 'ai', content: errorMessage }]);
