@@ -36,52 +36,54 @@ const timeSlots = [
 export function WeeklyPlan({ user }: WeeklyPlanProps) {
   const [selectedDay, setSelectedDay] = useState('Monday');
   const [selectedSemester, setSelectedSemester] = useState(user?.semester || '2nd Semester');
+  const [selectedSection, setSelectedSection] = useState(user?.section || 'A');
   const [dbSchedules, setDbSchedules] = useState<Record<string, Record<string, ClassSlot[]>>>({});
   const [loading, setLoading] = useState(true);
   const [currentDoc, setCurrentDoc] = useState<AcademicDocument | null>(null);
 
   useEffect(() => {
     fetchTimetable();
-  }, [selectedSemester]);
+  }, [selectedSemester, selectedSection]);
 
   const fetchTimetable = async () => {
     setLoading(true);
 
-    // 1. Fetch structured entries specifically for 4th Semester Section B (The Master Schedule)
+    // 1. Fetch structured entries specifically for selected semester and section
     const { data: entries, error: entryError } = await supabase
       .from('timetable_entries')
       .select('*')
-      .eq('semester', '4th Semester')
-      .eq('batch', '2024')
-      .or(`section.eq.B,section.eq.All`);
+      .eq('semester', selectedSemester)
+      .eq('batch', user?.batch || '2024')
+      .or(`section.eq.${selectedSection},section.eq.All`);
 
     if (!entryError && entries && entries.length > 0) {
       const formatted: Record<string, Record<string, ClassSlot[]>> = {};
 
-      // Populate EVERYTHING with this data
-      semesters.forEach(sem => {
-        formatted[sem] = {};
-        entries.forEach(entry => {
-          if (!formatted[sem][entry.day]) formatted[sem][entry.day] = [];
-          formatted[sem][entry.day].push({
-            time: entry.time_slot,
-            subject: entry.subject,
-            type: entry.type as 'Lecture' | 'Lab',
-            teacher: entry.faculty_name,
-            venue: entry.venue
-          });
+      // Group entries by semester and day
+      entries.forEach(entry => {
+        if (!formatted[entry.semester]) formatted[entry.semester] = {};
+        if (!formatted[entry.semester][entry.day]) formatted[entry.semester][entry.day] = [];
+        formatted[entry.semester][entry.day].push({
+          time: entry.time_slot,
+          subject: entry.subject,
+          type: entry.type as 'Lecture' | 'Lab',
+          teacher: entry.faculty_name,
+          venue: entry.venue
         });
       });
       setDbSchedules(formatted);
+    } else {
+      setDbSchedules({});
     }
 
-    // 2. Fetch the latest OFFICIAL DOCUMENT for 4th Semester
+    // 2. Fetch the latest OFFICIAL DOCUMENT for selected semester/section
     const { data: docs, error: docError } = await supabase
       .from('academic_documents')
       .select('*')
       .eq('category', 'timetable')
-      .eq('semester', '4th Semester')
-      .eq('batch', '2024')
+      .eq('semester', selectedSemester)
+      .eq('batch', user?.batch || '2024')
+      .or(`section.eq.${selectedSection},section.eq.All`)
       .order('created_at', { ascending: false })
       .limit(1);
 
@@ -96,6 +98,7 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
 
   const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday'];
   const semesters = ['1st Semester', '2nd Semester', '3rd Semester', '4th Semester', '5th Semester', '6th Semester', '7th Semester', '8th Semester'];
+  const sections = ['A', 'B', 'C', 'D'];
 
   const activeSchedules = Object.keys(dbSchedules).length > 0 ? dbSchedules : defaultSchedules;
 
@@ -160,18 +163,34 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
             </p>
           </div>
 
-          {/* Semester Selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Select Semester</label>
-            <select
-              value={selectedSemester}
-              onChange={(e) => setSelectedSemester(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white min-w-[160px]"
-            >
-              {semesters.map((sem) => (
-                <option key={sem} value={sem}>{sem}</option>
-              ))}
-            </select>
+          <div className="flex flex-wrap gap-4">
+            {/* Semester Selector */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Select Semester</label>
+              <select
+                value={selectedSemester}
+                onChange={(e) => setSelectedSemester(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white min-w-[150px]"
+              >
+                {semesters.map((sem) => (
+                  <option key={sem} value={sem}>{sem}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Section Selector */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Select Section</label>
+              <select
+                value={selectedSection}
+                onChange={(e) => setSelectedSection(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white min-w-[100px]"
+              >
+                {sections.map((sec) => (
+                  <option key={sec} value={sec}>Section {sec}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>
