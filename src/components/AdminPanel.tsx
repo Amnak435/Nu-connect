@@ -927,10 +927,10 @@ export function AdminPanel() {
                                     ))}
                                 </tbody>
                             </table>
-                        </div>
+                        )}
+                    </div>
                 )}
             </div>
         </div>
-        </div >
     );
 }
