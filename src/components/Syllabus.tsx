@@ -21,7 +21,7 @@ export function Syllabus({ user }: SyllabusProps) {
     const { data, error } = await supabase
       .from('academic_documents')
       .select('*')
-      .eq('category', 'syllabus')
+      .in('category', ['syllabus', 'lecture'])
       .eq('semester', user.semester)
       .eq('batch', user.batch || '2024')
       .order('created_at', { ascending: false });
@@ -273,6 +273,32 @@ export function Syllabus({ user }: SyllabusProps) {
                       <li>• Additional reading materials on LMS</li>
                     </ul>
                   </div>
+
+                  {/* Lecture Materials Section */}
+                  {syllabusDocs.some(d => d.category === 'lecture' && d.subject?.toLowerCase().includes(course.name.toLowerCase())) && (
+                    <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-100">
+                      <h5 className="font-medium text-blue-900 mb-2 text-sm flex items-center gap-2">
+                        <Upload className="w-4 h-4 rotate-180" />
+                        Lecture Materials
+                      </h5>
+                      <div className="space-y-2">
+                        {syllabusDocs
+                          .filter(d => d.category === 'lecture' && d.subject?.toLowerCase().includes(course.name.toLowerCase()))
+                          .map((doc, i) => (
+                            <a
+                              key={doc.id}
+                              href={doc.file_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="block p-2 bg-white rounded border border-blue-200 text-xs text-blue-800 hover:bg-blue-100 transition-colors flex items-center justify-between"
+                            >
+                              <span className="truncate flex-1">{doc.title || `Lecture ${i + 1}`}</span>
+                              <Download className="w-3 h-3 text-blue-500 ml-2" />
+                            </a>
+                          ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
