@@ -45,7 +45,7 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
 
       // Initialize API client here to ensure we have the key
       const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash-lite-001" });
+      const model = genAI.getGenerativeModel({ model: "gemini-flash-latest" });
 
       const prompt = `
         You are "Study Buddy AI", a helpful assistant for a student at NUTECH university.
