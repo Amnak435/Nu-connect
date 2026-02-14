@@ -1,36 +1,63 @@
-import { useState, useRef } from 'react';
-import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText } from 'lucide-react';
-// import { GoogleGenerativeAI } from '@google/generative-ai'; // Removed Gemini
+import { useState, useRef, useEffect } from 'react';
+import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText, Database, Trash2 } from 'lucide-react';
 import { csKnowledgeBase } from '../data/csKnowledgeBase';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Set worker source for PDF.js - using CDN for reliable offline/standalone behavior
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 interface StudyBuddyProps {
   user: any;
 }
 
+interface LearnedData {
+  fileName: string;
+  content: string;
+  timestamp: number;
+}
+
 export function StudyBuddy({ user }: StudyBuddyProps) {
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; content: string }>>([
-    {
-      role: 'ai',
-      content: `Hello ${user.name.split(' ')[0]}! 👋 I'm your New Offline Study Buddy (Free Mode). 
-
-I can help you with:
-• Explaining CS concepts from Semesters 1-8
-• Analyzing uploaded documents (Simulated PDF Scan)
-• Creating study plans
-
-How can I assist you today?`
-    }
-  ]);
+  // 1. Core States
+  const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; content: string }>>([]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [attachment, setAttachment] = useState<{ file: File; type: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // 2. Persistent Memory State (Self-Learning)
+  const [learnedSessionData, setLearnedSessionData] = useState<LearnedData[]>(() => {
+    const saved = localStorage.getItem(`nuconnect_buddy_memory_${user?.id || 'guest'}`);
+    return saved ? JSON.parse(saved) : [];
+  });
+
+  // Sync Memory to LocalStorage
+  useEffect(() => {
+    if (user?.id) {
+      localStorage.setItem(`nuconnect_buddy_memory_${user.id}`, JSON.stringify(learnedSessionData));
+    }
+  }, [learnedSessionData, user?.id]);
+
+  // Initial Greeting
+  useEffect(() => {
+    setMessages([
+      {
+        role: 'ai',
+        content: `Hello ${user?.name?.split(' ')[0] || 'Student'}! 👋 I'm your **Persistent Self-Learning** Study Buddy.
+
+I remember everything you've taught me from your PDF uploads. ${learnedSessionData.length > 0
+            ? `I currently have knowledge from **${learnedSessionData.length} documents** you shared earlier.`
+            : "Upload a PDF, and I'll learn its contents and remember them for your future sessions!"}
+
+What should we study today?`
+      }
+    ]);
+  }, [user?.name, learnedSessionData.length]);
+
   const quickActions = [
-    { icon: BookOpen, label: 'Explain a topic', prompt: 'Explain OOP' },
-    { icon: Brain, label: 'Data Structures', prompt: 'Tell me about BST' },
-    { icon: Trophy, label: 'Database', prompt: 'What is Normalization?' },
-    { icon: Sparkles, label: 'Upload PDF', prompt: 'Analyze this PDF for me' }
+    { icon: BookOpen, label: 'Explain OOP', prompt: 'Explain Object Oriented Programming' },
+    { icon: Brain, label: 'Data Structures', prompt: 'Tell me about Binary Search Trees' },
+    { icon: Trophy, label: 'Normalization', prompt: 'What is Database Normalization?' },
+    { icon: Sparkles, label: 'Upload PDF', prompt: 'LEARN_PDF_TRIGGER' }
   ];
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -44,65 +71,111 @@ How can I assist you today?`
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
-  // Simplified Mock Extraction to ensure build success without complex PDF libs
+  const clearMemory = () => {
+    if (window.confirm("Are you sure you want me to forget everything I've learned from your PDFs?")) {
+      setLearnedSessionData([]);
+      localStorage.removeItem(`nuconnect_buddy_memory_${user?.id || 'guest'}`);
+      setMessages(prev => [...prev, { role: 'ai', content: "Memory cleared. My brain is now back to its default state." }]);
+    }
+  };
+
   const extractTextFromPDF = async (file: File): Promise<string> => {
-    // In a real offline app without worker issues, we'd use pdfjs-dist.
-    // For now, we simulate extraction based on filename to guarantee the UI updates.
-    await new Promise(resolve => setTimeout(resolve, 1500)); // Simulate processing time
-    return `Simulated content for ${file.name}.`;
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+      const pdf = await loadingTask.promise;
+      let fullText = '';
+
+      const maxPages = Math.min(pdf.numPages, 10);
+      for (let i = 1; i <= maxPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item: any) => (item as any).str).join(' ');
+        fullText += pageText + ' ';
+      }
+      return fullText;
+    } catch (error) {
+      console.error('PDF Extraction Error:', error);
+      return '';
+    }
   };
 
   const generateOfflineResponse = async (query: string, file?: File): Promise<string> => {
     let response = '';
 
-    if (file) {
-      response += `**Document Analysis (${file.name}):**\nI've scanned the document. `;
+    // 1. Learning Phase (Process Uploads)
+    if (file && file.type === 'application/pdf') {
+      const pdfText = await extractTextFromPDF(file);
+      if (pdfText) {
+        if (learnedSessionData.some(d => d.fileName === file.name)) {
+          return `I already remember **${file.name}**. You can ask me anything about its contents!`;
+        }
 
-      // Heuristic: Check filename for keywords since we can't parse content easily in this build
-      const fileNameLower = file.name.toLowerCase();
-      const foundTopics = csKnowledgeBase.filter(concept =>
-        concept.keywords.some(k => fileNameLower.includes(k.toLowerCase())) ||
-        fileNameLower.includes(concept.topic.toLowerCase())
-      );
+        setLearnedSessionData(prev => [...prev, {
+          fileName: file.name,
+          content: pdfText,
+          timestamp: Date.now()
+        }]);
 
-      if (foundTopics.length > 0) {
-        const uniqueTopics = [...new Set(foundTopics.map(t => t.topic))];
-        response += `It seems to cover: **${uniqueTopics.slice(0, 3).join(', ')}**.\n\nHere is what I know about them:\n`;
-        foundTopics.slice(0, 2).forEach(t => {
-          response += `\n**${t.topic}:** ${t.explanation.substring(0, 100)}...\n`;
-        });
+        response += `### 🧠 Long-Term Memory Updated: ${file.name}\n\nI've analyzed and stored this document in my brain. I will remember this even if you log out and come back later! `;
+
+        const matchedCoreTopics = csKnowledgeBase.filter(concept =>
+          pdfText.toLowerCase().includes(concept.topic.toLowerCase())
+        );
+
+        if (matchedCoreTopics.length > 0) {
+          response += `This document matches my core knowledge about **${matchedCoreTopics[0].topic}**. `;
+        }
+
+        response += `\n\n**Quick Preview:** ${pdfText.substring(0, 200)}...`;
       } else {
-        response += `It appears to be a general document. I've noted it for your session.\n\n`;
+        response = "I couldn't read that PDF. Please ensure it has clear, selectable text.";
       }
+      return response;
     }
 
-    // Keyword Matching for Query
+    // 2. Retrieval Phase
     const lowerQuery = query.toLowerCase();
-    const match = csKnowledgeBase.find(concept =>
+
+    // Check Core Knowledge Base
+    const coreMatch = csKnowledgeBase.find(concept =>
       concept.keywords.some(k => lowerQuery.includes(k.toLowerCase())) ||
       lowerQuery.includes(concept.topic.toLowerCase())
     );
 
-    if (match) {
-      response += `### ${match.topic}\n\n${match.explanation}\n\n*Related: ${match.related?.join(', ') || 'None'}*`;
-    } else if (!file && query.trim()) {
-      // Fallback for greetings or unknown topics
-      if (lowerQuery.includes('hello') || lowerQuery.includes('hi')) {
-        response += "Hello! ask me about any CS topic.";
-      } else {
-        response += "I don't have that specific topic in my offline database yet. Try asking about **OOP**, **BST**, **Normalization**, **Process**, or **Compilers**.";
+    if (coreMatch) {
+      response = `### ${coreMatch.topic}\n\n${coreMatch.explanation}\n\n*Related: ${coreMatch.related?.join(', ') || 'None'}*`;
+    }
+    // Check Persistent Memory (Self-Learning)
+    else if (learnedSessionData.length > 0) {
+      const learnedMatch = learnedSessionData.find(doc =>
+        doc.content.toLowerCase().includes(lowerQuery) ||
+        lowerQuery.split(' ').some(word => word.length > 4 && doc.content.toLowerCase().includes(word))
+      );
+
+      if (learnedMatch) {
+        const index = learnedMatch.content.toLowerCase().indexOf(lowerQuery);
+        const start = Math.max(0, (index === -1 ? 0 : index) - 100);
+        const end = Math.min(learnedMatch.content.length, start + 500);
+        const snippet = learnedMatch.content.substring(start, end);
+
+        response = `### 📖 From My Memorized Data: ${learnedMatch.fileName}\n\nI found this in the documents you taught me:\n\n"...${snippet}..."\n\n*Source: User-Uploaded Memory*`;
       }
     }
 
-    if (!response && file) {
-      response = "I've analyzed the file and it looks good.";
+    if (!response) {
+      if (lowerQuery.includes('hello') || lowerQuery.includes('hi')) {
+        response = `Hello! I remember **${learnedSessionData.length}** of your documents. How can I help you?`;
+      } else {
+        response = "I don't have that in my core brain or my memorized documents yet. Try uploading a PDF about it!";
+      }
     }
 
-    return response || "I've processed your request.";
+    return response;
   };
 
   const handleSendMessage = async () => {
-    if ((!inputMessage.trim() && !attachment) || isTyping) return;
+    if (!inputMessage.trim() && !attachment) return;
 
     const userMsg = inputMessage;
     const currentAttachment = attachment;
@@ -113,189 +186,138 @@ How can I assist you today?`
 
     setIsTyping(true);
 
-    const attachmentMsg = currentAttachment ? `\n[Attached: ${currentAttachment.file.name}]` : '';
-    const newMessages = [...messages, { role: 'user' as const, content: userMsg + attachmentMsg }];
+    const fullUserMsg = userMsg + (currentAttachment ? `\n[Attached: ${currentAttachment.file.name}]` : '');
+    const newMessages = [...messages, { role: 'user' as const, content: fullUserMsg }];
     setMessages(newMessages);
 
-    // Simulate AI Delay
-    setTimeout(async () => {
-      const responseText = await generateOfflineResponse(userMsg, currentAttachment?.file);
-      setMessages([...newMessages, { role: 'ai', content: responseText }]);
-      setIsTyping(false);
-    }, 1000);
-  };
-
-  const handleQuickAction = (prompt: string) => {
-    if (prompt.includes('Upload') || prompt.includes('PDF')) {
-      fileInputRef.current?.click();
-    } else {
-      setInputMessage(prompt);
-    }
+    const responseText = await generateOfflineResponse(userMsg, currentAttachment?.file);
+    setMessages([...newMessages, { role: 'ai' as const, content: responseText }]);
+    setIsTyping(false);
   };
 
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col h-[650px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-green-100 font-sans">
       {/* Header */}
-      <div className="bg-gradient-to-r from-purple-600 to-blue-600 rounded-xl shadow-lg p-6 text-white">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center">
-            <Bot className="w-7 h-7 text-purple-600" />
+      <div className="bg-gradient-to-r from-green-700 via-green-600 to-green-800 p-5 text-white flex items-center justify-between shadow-md">
+        <div className="flex items-center gap-4">
+          <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm">
+            <Brain className="w-7 h-7" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold">Study Buddy (Offline Mode)</h2>
-            <p className="text-purple-100">Instant answers from Semesters 1-8 Database</p>
+            <h2 className="font-extrabold text-xl tracking-tight">Study Buddy AI</h2>
+            <div className="flex items-center gap-2">
+              <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-green-50 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
+                <Database className="w-3 h-3" /> Offline Memory Mode
+              </span>
+              {learnedSessionData.length > 0 && (
+                <span className="text-[10px] text-green-200 font-medium">Knowledge Base: {learnedSessionData.length} Docs</span>
+              )}
+            </div>
           </div>
         </div>
+
+        {learnedSessionData.length > 0 && (
+          <button
+            onClick={clearMemory}
+            className="p-2 hover:bg-red-500/20 rounded-lg transition-colors text-green-100 hover:text-white"
+            title="Clear AI memory"
+          >
+            <Trash2 className="w-5 h-5" />
+          </button>
+        )}
       </div>
 
-      {/* Quick Actions */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-        <h3 className="font-semibold text-gray-800 mb-4">Quick Actions</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-          {quickActions.map((action, index) => {
-            const Icon = action.icon;
-            return (
-              <button
-                key={index}
-                onClick={() => handleQuickAction(action.prompt)}
-                className="flex items-center gap-3 p-4 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group text-left"
-              >
-                <div className="w-10 h-10 bg-purple-50 rounded-lg flex items-center justify-center group-hover:bg-purple-100 shrink-0">
-                  <Icon className="w-5 h-5 text-purple-600" />
+      {/* Messages area */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-gray-50/30">
+        {messages.map((msg, i) => (
+          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+            <div className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-green-600' : 'bg-white border border-green-100'
+                }`}>
+                {msg.role === 'user' ? <Trophy className="w-5 h-5 text-white" /> : <Bot className="w-5 h-5 text-green-600" />}
+              </div>
+              <div className={`p-4 rounded-2xl shadow-sm ${msg.role === 'user'
+                  ? 'bg-green-600 text-white rounded-tr-none'
+                  : 'bg-white text-gray-800 border border-green-100 rounded-tl-none'
+                }`}>
+                <div className="text-sm md:text-base leading-relaxed whitespace-pre-wrap font-medium">
+                  {msg.content}
                 </div>
-                <span className="text-sm font-medium text-gray-700 group-hover:text-purple-700">
-                  {action.label}
-                </span>
-              </button>
-            );
-          })}
-        </div>
+              </div>
+            </div>
+          </div>
+        ))}
+        {isTyping && (
+          <div className="flex justify-start">
+            <div className="bg-white border border-green-100 px-4 py-3 rounded-2xl shadow-sm flex gap-1.5 items-center">
+              <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" />
+              <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce [animation-delay:0.2s]" />
+              <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce [animation-delay:0.4s]" />
+            </div>
+          </div>
+        )}
       </div>
 
-      {/* Chat Interface */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col" style={{ height: '600px' }}>
-        {/* Messages */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 font-sans text-base">
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={`flex gap-3 ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-            >
-              {message.role === 'ai' && (
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center shrink-0">
-                  <Bot className="w-5 h-5 text-purple-600" />
-                </div>
-              )}
-              <div
-                className={`max-w-[80%] rounded-xl px-4 py-3 ${message.role === 'user'
-                  ? 'bg-purple-600 text-white'
-                  : 'bg-gray-100 text-gray-800'
-                  }`}
-              >
-                <div className="text-sm md:text-base whitespace-pre-line leading-relaxed">
-                  {message.content}
-                </div>
-              </div>
-              {message.role === 'user' && (
-                <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center shrink-0">
-                  <span className="text-sm font-semibold text-purple-600">
-                    {user.name.charAt(0)}
-                  </span>
-                </div>
-              )}
-            </div>
-          ))}
-          {isTyping && (
-            <div className="flex gap-3 justify-start">
-              <div className="w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center shrink-0">
-                <Bot className="w-5 h-5 text-purple-600" />
-              </div>
-              <div className="bg-gray-100 rounded-xl px-4 py-3">
-                <div className="flex gap-1">
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-75"></div>
-                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce delay-150"></div>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Input Area */}
-        <div className="border-t p-4 bg-gray-50 space-y-3">
-          {attachment && (
-            <div className="flex items-center gap-2 px-3 py-2 bg-purple-100 border border-purple-200 rounded-lg w-fit">
-              <FileText className="w-4 h-4 text-purple-600" />
-              <span className="text-sm text-purple-700 truncate max-w-[200px]">{attachment.file.name}</span>
-              <button onClick={removeAttachment} className="ml-2 hover:bg-purple-200 rounded-full p-1">
-                <X className="w-3 h-3 text-purple-700" />
-              </button>
-            </div>
-          )}
-
-          <div className="flex gap-2 items-center">
-            <input
-              type="file"
-              ref={fileInputRef}
-              className="hidden"
-              accept="application/pdf"
-              onChange={handleFileSelect}
-            />
+      {/* Quick Actions Bar */}
+      {messages.length < 3 && (
+        <div className="px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar border-t border-gray-100 bg-white">
+          {quickActions.map((action, idx) => (
             <button
-              onClick={() => fileInputRef.current?.click()}
-              className="p-3 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-              title="Upload PDF"
+              key={idx}
+              onClick={() => action.prompt === 'LEARN_PDF_TRIGGER' ? fileInputRef.current?.click() : setInputMessage(action.prompt)}
+              className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-xs font-semibold whitespace-nowrap hover:bg-green-100 transition-colors border border-green-100"
             >
-              <Paperclip className="w-5 h-5" />
+              <action.icon className="w-3 h-3" />
+              {action.label}
             </button>
+          ))}
+        </div>
+      )}
 
+      {/* Input section */}
+      <div className="p-5 bg-white border-t border-green-100 space-y-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+        {attachment && (
+          <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl animate-in fade-in slide-in-from-bottom-2 border border-green-100">
+            <FileText className="w-5 h-5 text-green-600" />
+            <span className="text-sm font-bold text-green-800 truncate flex-1">{attachment.file.name}</span>
+            <button onClick={removeAttachment} className="p-1.5 hover:bg-green-200 rounded-full text-green-700 transition-colors">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        )}
+
+        <div className="flex items-center gap-4">
+          <input
+            type="file"
+            ref={fileInputRef}
+            onChange={handleFileSelect}
+            accept=".pdf"
+            className="hidden"
+          />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="p-3.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-2xl transition-all border border-gray-200 hover:border-green-200 shadow-sm"
+            title="Attach Study Material (PDF)"
+          >
+            <Paperclip className="w-6 h-6" />
+          </button>
+
+          <div className="flex-1 relative group">
             <input
               type="text"
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
-              onKeyPress={(e) => e.key === 'Enter' && handleSendMessage()}
-              placeholder={attachment ? "Ask about this file..." : "Ask me anything about your courses..."}
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none"
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              placeholder={attachment ? "Ask about this file..." : "Ask me anything..."}
+              className="w-full pl-5 pr-14 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/5 transition-all outline-none font-medium"
             />
             <button
               onClick={handleSendMessage}
-              disabled={(!inputMessage.trim() && !attachment) || isTyping}
-              className="px-6 py-3 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 text-white bg-green-600 rounded-xl hover:bg-green-700 active:scale-95 transition-all shadow-lg shadow-green-200/50"
             >
-              <Send className="w-4 h-4" />
-              <span className="hidden sm:inline">Send</span>
+              <Send className="w-5 h-5" />
             </button>
           </div>
-          <p className="text-xs text-gray-500 mt-2 text-center">
-            💡 Offline Mode Active. Supports: PDF Analysis & Core CS Topics.
-          </p>
-        </div>
-      </div>
-
-      {/* AI Capabilities */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-4">
-            <Sparkles className="w-6 h-6 text-green-600" />
-          </div>
-          <h4 className="font-semibold text-gray-800 mb-2">Detailed Explanations</h4>
-          <p className="text-sm text-gray-600">Access a database of CS concepts from basic algorithms to advanced compilers.</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-4">
-            <Brain className="w-6 h-6 text-purple-600" />
-          </div>
-          <h4 className="font-semibold text-gray-800 mb-2">Semesters 1-8 Covered</h4>
-          <p className="text-sm text-gray-600">Complete knowledge of the Computer Science curriculum for all semesters.</p>
-        </div>
-
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-          <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
-            <FileText className="w-6 h-6 text-blue-600" />
-          </div>
-          <h4 className="font-semibold text-gray-800 mb-2">Document Scanner</h4>
-          <p className="text-sm text-gray-600">Scans PDFs for known keywords and summarizes based on course material.</p>
         </div>
       </div>
     </div>
