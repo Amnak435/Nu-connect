@@ -4,10 +4,10 @@ import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText } 
 import { csKnowledgeBase } from '../data/csKnowledgeBase';
 import * as pdfjsLib from 'pdfjs-dist';
 
-// Set worker source for PDF.js - attempting to use a CDN to avoid local build issues
-// In a production app, you might want to bundle the worker.
+// Set worker source for PDF.js - using a fixed version ensuring compatibility if strictly needed, 
+// but here we use the version from the installed package.
+// If this fails in production (Vercel), we might need to copy the worker file to public/
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
-
 
 interface StudyBuddyProps {
   user: any;
@@ -90,7 +90,7 @@ How can I assist you today?`
           const uniqueTopics = [...new Set(foundTopics.map(t => t.topic))];
           response += `It seems to cover: **${uniqueTopics.slice(0, 3).join(', ')}**.\n\n`;
         } else {
-          response += `It contains general text about: "${pdfText.substring(0, 50)}..."\n\n`;
+          response += `Bsaed on my scan, it contains text about: "${pdfText.substring(0, 50)}..."\n\n`;
         }
       } else {
         response += `(I couldn't read the text from ${file.name}, but I see it's a PDF.)\n\n`;
