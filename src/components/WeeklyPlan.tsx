@@ -158,357 +158,358 @@ export function WeeklyPlan({ user }: WeeklyPlanProps) {
               <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-green-600 shrink-0" />
               <h2 className="text-xl sm:text-2xl font-bold text-gray-800">Weekly Timetable</h2>
             </div>
-            NUTECH CS Department • {isSpring ? 'Spring' : 'Fall'} 2026 • Section {selectedSection}
-          </p>
-        </div>
-
-        <div className="flex flex-wrap gap-4">
-          {/* Semester Selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Select Semester</label>
-            <select
-              value={selectedSemester}
-              onChange={(e) => setSelectedSemester(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white min-w-[150px]"
-            >
-              {semesters.map((sem) => (
-                <option key={sem} value={sem}>{sem}</option>
-              ))}
-            </select>
+            <p className="text-xs sm:text-sm text-gray-600">
+              NUTECH CS Department • {isSpring ? 'Spring' : 'Fall'} 2026 • Section {selectedSection}
+            </p>
           </div>
 
-          {/* Section Selector */}
-          <div>
-            <label className="block text-sm font-medium text-gray-600 mb-1">Select Section</label>
-            <select
-              value={selectedSection}
-              onChange={(e) => setSelectedSection(e.target.value)}
-              className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white min-w-[100px]"
-            >
-              {sections.map((sec) => (
-                <option key={sec} value={sec}>Section {sec}</option>
-              ))}
-            </select>
+          <div className="flex flex-wrap gap-4">
+            {/* Semester Selector */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Select Semester</label>
+              <select
+                value={selectedSemester}
+                onChange={(e) => setSelectedSemester(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white min-w-[150px]"
+              >
+                {semesters.map((sem) => (
+                  <option key={sem} value={sem}>{sem}</option>
+                ))}
+              </select>
+            </div>
+
+            {/* Section Selector */}
+            <div>
+              <label className="block text-sm font-medium text-gray-600 mb-1">Select Section</label>
+              <select
+                value={selectedSection}
+                onChange={(e) => setSelectedSection(e.target.value)}
+                className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent outline-none bg-white min-w-[100px]"
+              >
+                {sections.map((sec) => (
+                  <option key={sec} value={sec}>Section {sec}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-      {/* Official Document View */ }
-  {
-    currentDoc && (
-      <div className="bg-white rounded-xl shadow-lg border-2 border-green-100 overflow-hidden">
-        <div className="bg-green-600 px-6 py-3 flex items-center justify-between">
-          <div className="flex items-center gap-2 text-white">
-            <FileText className="w-5 h-5" />
-            <h3 className="font-bold">Official {selectedSemester} Timetable</h3>
-          </div>
-          <a
-            href={currentDoc.file_url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="px-3 py-1 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium transition-all"
-          >
-            Open Full Size
-          </a>
-        </div>
-        <div className="p-4 bg-gray-50 flex justify-center border-b">
-          {currentDoc.file_type?.toLowerCase() === 'pdf' ? (
-            <div className="py-12 text-center">
-              <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-              <p className="text-gray-600 font-medium">Timetable available as PDF document</p>
+      {/* Official Document View */}
+      {
+        currentDoc && (
+          <div className="bg-white rounded-xl shadow-lg border-2 border-green-100 overflow-hidden">
+            <div className="bg-green-600 px-6 py-3 flex items-center justify-between">
+              <div className="flex items-center gap-2 text-white">
+                <FileText className="w-5 h-5" />
+                <h3 className="font-bold">Official {selectedSemester} Timetable</h3>
+              </div>
               <a
                 href={currentDoc.file_url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-4 inline-flex items-center gap-2 bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition-all"
+                className="px-3 py-1 bg-white/20 hover:bg-white/30 text-white rounded-lg text-sm font-medium transition-all"
               >
-                <Upload className="w-4 h-4 rotate-180" />
-                View PDF Timetable
+                Open Full Size
               </a>
             </div>
-          ) : (
-            <div className="relative group max-w-4xl w-full">
-              <img
-                src={currentDoc.file_url}
-                alt="Official Timetable"
-                className="w-full h-auto rounded-lg shadow-sm border border-gray-200"
-              />
-              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
-                <a
-                  href={currentDoc.file_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="bg-white text-green-700 px-6 py-2 rounded-full font-bold shadow-xl transform scale-90 group-hover:scale-100 transition-transform"
-                >
-                  Click to Zoom
-                </a>
-              </div>
-            </div>
-          )}
-        </div>
-        {currentDoc.description && (
-          <div className="px-6 py-3 bg-white text-sm text-gray-500 italic">
-            Note: {currentDoc.description}
-          </div>
-        )}
-      </div>
-    )
-  }
-
-  {/* Day Selector */ }
-  <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
-    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
-      {days.map((day) => (
-        <button
-          key={day}
-          onClick={() => setSelectedDay(day)}
-          className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-all whitespace-nowrap flex items-center gap-2 ${selectedDay === day
-            ? 'bg-green-600 text-white shadow-md'
-            : day === today
-              ? 'bg-green-100 text-green-700 border-2 border-green-300'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-            }`}
-        >
-          {day}
-          {day === today && selectedDay !== day && (
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
-          )}
-        </button>
-      ))}
-    </div>
-  </div>
-
-  {/* Schedule for Selected Day */ }
-  <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-    <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b">
-      <div className="flex items-center justify-between">
-        <div>
-          <h3 className="font-semibold text-gray-800">{selectedDay}'s Schedule</h3>
-          <p className="text-sm text-gray-600 mt-1">
-            {currentSchedule.length} {currentSchedule.length === 1 ? 'class' : 'classes'} scheduled • {selectedSemester}
-          </p>
-        </div>
-        {selectedDay === today && (
-          <span className="px-3 py-1 bg-green-600 text-white text-sm font-medium rounded-full">
-            Today
-          </span>
-        )}
-      </div>
-    </div>
-
-    <div className="p-6">
-      {currentSchedule.length > 0 ? (
-        <div className="space-y-4">
-          {currentSchedule.map((cls, index) => (
-            <div
-              key={index}
-              className={`relative border-l-4 ${cls.type === 'Lab' ? 'border-purple-500' : 'border-green-500'
-                } bg-gray-50 rounded-lg p-5 hover:bg-green-50 transition-colors`}
-            >
-              <div className="flex flex-col gap-3">
-                {/* Time & Type */}
-                <div className="flex items-center gap-4 flex-wrap">
-                  <div className="flex items-center gap-2 text-green-700 font-medium">
-                    <Clock className="w-4 h-4" />
-                    <span className="text-sm font-mono">{cls.time}</span>
+            <div className="p-4 bg-gray-50 flex justify-center border-b">
+              {currentDoc.file_type?.toLowerCase() === 'pdf' ? (
+                <div className="py-12 text-center">
+                  <FileText className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+                  <p className="text-gray-600 font-medium">Timetable available as PDF document</p>
+                  <a
+                    href={currentDoc.file_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-4 inline-flex items-center gap-2 bg-green-600 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-700 transition-all"
+                  >
+                    <Upload className="w-4 h-4 rotate-180" />
+                    View PDF Timetable
+                  </a>
+                </div>
+              ) : (
+                <div className="relative group max-w-4xl w-full">
+                  <img
+                    src={currentDoc.file_url}
+                    alt="Official Timetable"
+                    className="w-full h-auto rounded-lg shadow-sm border border-gray-200"
+                  />
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center rounded-lg">
+                    <a
+                      href={currentDoc.file_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="bg-white text-green-700 px-6 py-2 rounded-full font-bold shadow-xl transform scale-90 group-hover:scale-100 transition-transform"
+                    >
+                      Click to Zoom
+                    </a>
                   </div>
-                  <span className={`px-2.5 py-1 text-xs font-medium rounded-full flex items-center gap-1 ${cls.type === 'Lab'
-                    ? 'bg-purple-100 text-purple-700'
-                    : 'bg-green-100 text-green-700'
-                    }`}>
-                    {cls.type === 'Lab' ? (
-                      <FlaskConical className="w-3 h-3" />
-                    ) : (
-                      <BookOpen className="w-3 h-3" />
-                    )}
-                    {cls.type}
-                  </span>
                 </div>
-
-                {/* Subject */}
-                <h4 className="font-bold text-gray-800 text-lg">{cls.subject}</h4>
-
-                {/* Teacher & Venue */}
-                <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-                  {cls.teacher && (
-                    <div className="flex items-center gap-2">
-                      <UserIcon className="w-4 h-4 text-blue-500" />
-                      <span>{cls.teacher}</span>
-                    </div>
-                  )}
-                  {cls.venue && (
-                    <div className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4 text-orange-500" />
-                      <span className="font-medium">{cls.venue}</span>
-                    </div>
-                  )}
-                </div>
-              </div>
+              )}
             </div>
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-12">
-          <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-          <p className="text-gray-500 text-lg font-medium">No classes on {selectedDay}</p>
-          <p className="text-gray-400 text-sm mt-1">Enjoy your free day! 🎉</p>
-        </div>
-      )}
-    </div>
-  </div>
+            {currentDoc.description && (
+              <div className="px-6 py-3 bg-white text-sm text-gray-500 italic">
+                Note: {currentDoc.description}
+              </div>
+            )}
+          </div>
+        )
+      }
 
-  {/* Full Week Overview */ }
-  <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-    <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
-      <h3 className="font-semibold text-gray-800">Full Week Overview - {selectedSemester}</h3>
-    </div>
-    <div className="overflow-x-auto">
-      <table className="w-full min-w-[900px]">
-        <thead>
-          <tr className="bg-gray-50">
-            <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b w-32">Time</th>
-            {days.map((day) => (
-              <th key={day} className={`px-4 py-3 text-left text-sm font-medium border-b ${day === today ? 'bg-green-50 text-green-700' : 'text-gray-600'
-                }`}>
-                {day}
-              </th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {timeSlots.map((slot) => {
-            const dayEntries = days.map(day => {
-              const daySchedule = activeSchedules[selectedSemester]?.[day] || [];
-              // Match with tolerance for hyphens/spaces
-              return daySchedule.find(c => {
-                const normalizedC = c.time.replace(/\s/g, '').replace(/–/g, '-');
-                const normalizedSlot = slot.replace(/\s/g, '').replace(/–/g, '-');
-                return normalizedC === normalizedSlot;
-              });
-            });
-
-            const hasAnyClass = dayEntries.some(c => !!c);
-
-            if (!hasAnyClass) return null;
-
-            return (
-              <tr key={slot} className="border-b hover:bg-gray-50">
-                <td className="px-4 py-3 text-xs font-mono text-gray-600 whitespace-nowrap">
-                  {slot}
-                </td>
-                {days.map((day, idx) => {
-                  const cls = dayEntries[idx];
-
-                  return (
-                    <td key={day} className={`px-3 py-2 ${day === today ? 'bg-green-50/50' : ''}`}>
-                      {cls ? (
-                        <div className={`px-3 py-2 rounded-lg text-xs ${cls.type === 'Lab'
-                          ? 'bg-purple-100 text-purple-800 border border-purple-200'
-                          : 'bg-green-100 text-green-800 border border-green-200'
-                          }`}>
-                          <div className="font-semibold truncate">{cls.subject}</div>
-                          {cls.venue && (
-                            <div className="text-[10px] opacity-75 mt-1 flex items-center gap-1">
-                              <MapPin className="w-3 h-3" />
-                              {cls.venue}
-                            </div>
-                          )}
-                        </div>
-                      ) : (
-                        <span className="text-gray-300">—</span>
-                      )}
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-    </div>
-  </div>
-
-  {/* Weekly Summary */ }
-  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
-      <div className="text-center">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
-          <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
-        </div>
-        <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stats.totalClasses}</p>
-        <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase tracking-wider font-semibold">Classes/Week</p>
-      </div>
-    </div>
-
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
-      <div className="text-center">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
-          <FlaskConical className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
-        </div>
-        <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stats.labSessions}</p>
-        <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase tracking-wider font-semibold">Labs</p>
-      </div>
-    </div>
-
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 col-span-2 md:col-span-1">
-      <div className="text-center">
-        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
-          <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
-        </div>
-        <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stats.uniqueCourses}</p>
-        <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase tracking-wider font-semibold">Courses</p>
-      </div>
-    </div>
-  </div>
-
-  {/* Course List for Semester */ }
-  <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-    <div className="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 border-b">
-      <h3 className="font-semibold text-gray-800">📚 Courses - {selectedSemester}</h3>
-    </div>
-    <div className="p-6">
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-        {Array.from(new Set(
-          Object.values(activeSchedules[selectedSemester] || {})
-            .flat()
-            .map(c => c.subject)
-        )).map((course, idx) => {
-          const courseData = Object.values(activeSchedules[selectedSemester] || {})
-            .flat()
-            .find(c => c.subject === course);
-          const isLab = course.includes('Lab');
-
-          return (
-            <div
-              key={idx}
-              className={`p-3 rounded-lg border ${isLab
-                ? 'bg-purple-50 border-purple-200'
-                : 'bg-green-50 border-green-200'
+      {/* Day Selector */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4">
+        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+          {days.map((day) => (
+            <button
+              key={day}
+              onClick={() => setSelectedDay(day)}
+              className={`px-4 sm:px-6 py-2.5 sm:py-3 rounded-lg text-sm sm:text-base font-medium transition-all whitespace-nowrap flex items-center gap-2 ${selectedDay === day
+                ? 'bg-green-600 text-white shadow-md'
+                : day === today
+                  ? 'bg-green-100 text-green-700 border-2 border-green-300'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
             >
-              <div className="flex items-start gap-2">
-                {isLab ? (
-                  <FlaskConical className="w-4 h-4 text-purple-600 mt-0.5" />
-                ) : (
-                  <BookOpen className="w-4 h-4 text-green-600 mt-0.5" />
-                )}
-                <div>
-                  <p className="font-medium text-gray-800 text-sm">{course}</p>
-                  {courseData?.teacher && (
-                    <p className="text-xs text-gray-600 mt-1">{courseData.teacher}</p>
-                  )}
-                  {courseData?.venue && (
-                    <p className="text-xs text-gray-500">{courseData.venue}</p>
-                  )}
-                </div>
-              </div>
-            </div>
-          );
-        })}
+              {day}
+              {day === today && selectedDay !== day && (
+                <span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span>
+              )}
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
-  </div>
+
+      {/* Schedule for Selected Day */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-green-50 to-emerald-50 px-6 py-4 border-b">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="font-semibold text-gray-800">{selectedDay}'s Schedule</h3>
+              <p className="text-sm text-gray-600 mt-1">
+                {currentSchedule.length} {currentSchedule.length === 1 ? 'class' : 'classes'} scheduled • {selectedSemester}
+              </p>
+            </div>
+            {selectedDay === today && (
+              <span className="px-3 py-1 bg-green-600 text-white text-sm font-medium rounded-full">
+                Today
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="p-6">
+          {currentSchedule.length > 0 ? (
+            <div className="space-y-4">
+              {currentSchedule.map((cls, index) => (
+                <div
+                  key={index}
+                  className={`relative border-l-4 ${cls.type === 'Lab' ? 'border-purple-500' : 'border-green-500'
+                    } bg-gray-50 rounded-lg p-5 hover:bg-green-50 transition-colors`}
+                >
+                  <div className="flex flex-col gap-3">
+                    {/* Time & Type */}
+                    <div className="flex items-center gap-4 flex-wrap">
+                      <div className="flex items-center gap-2 text-green-700 font-medium">
+                        <Clock className="w-4 h-4" />
+                        <span className="text-sm font-mono">{cls.time}</span>
+                      </div>
+                      <span className={`px-2.5 py-1 text-xs font-medium rounded-full flex items-center gap-1 ${cls.type === 'Lab'
+                        ? 'bg-purple-100 text-purple-700'
+                        : 'bg-green-100 text-green-700'
+                        }`}>
+                        {cls.type === 'Lab' ? (
+                          <FlaskConical className="w-3 h-3" />
+                        ) : (
+                          <BookOpen className="w-3 h-3" />
+                        )}
+                        {cls.type}
+                      </span>
+                    </div>
+
+                    {/* Subject */}
+                    <h4 className="font-bold text-gray-800 text-lg">{cls.subject}</h4>
+
+                    {/* Teacher & Venue */}
+                    <div className="flex flex-wrap gap-4 text-sm text-gray-600">
+                      {cls.teacher && (
+                        <div className="flex items-center gap-2">
+                          <UserIcon className="w-4 h-4 text-blue-500" />
+                          <span>{cls.teacher}</span>
+                        </div>
+                      )}
+                      {cls.venue && (
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4 text-orange-500" />
+                          <span className="font-medium">{cls.venue}</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12">
+              <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+              <p className="text-gray-500 text-lg font-medium">No classes on {selectedDay}</p>
+              <p className="text-gray-400 text-sm mt-1">Enjoy your free day! 🎉</p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Full Week Overview */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-50 to-indigo-50 px-6 py-4 border-b">
+          <h3 className="font-semibold text-gray-800">Full Week Overview - {selectedSemester}</h3>
+        </div>
+        <div className="overflow-x-auto">
+          <table className="w-full min-w-[900px]">
+            <thead>
+              <tr className="bg-gray-50">
+                <th className="px-4 py-3 text-left text-sm font-medium text-gray-600 border-b w-32">Time</th>
+                {days.map((day) => (
+                  <th key={day} className={`px-4 py-3 text-left text-sm font-medium border-b ${day === today ? 'bg-green-50 text-green-700' : 'text-gray-600'
+                    }`}>
+                    {day}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {timeSlots.map((slot) => {
+                const dayEntries = days.map(day => {
+                  const daySchedule = activeSchedules[selectedSemester]?.[day] || [];
+                  // Match with tolerance for hyphens/spaces
+                  return daySchedule.find(c => {
+                    const normalizedC = c.time.replace(/\s/g, '').replace(/–/g, '-');
+                    const normalizedSlot = slot.replace(/\s/g, '').replace(/–/g, '-');
+                    return normalizedC === normalizedSlot;
+                  });
+                });
+
+                const hasAnyClass = dayEntries.some(c => !!c);
+
+                if (!hasAnyClass) return null;
+
+                return (
+                  <tr key={slot} className="border-b hover:bg-gray-50">
+                    <td className="px-4 py-3 text-xs font-mono text-gray-600 whitespace-nowrap">
+                      {slot}
+                    </td>
+                    {days.map((day, idx) => {
+                      const cls = dayEntries[idx];
+
+                      return (
+                        <td key={day} className={`px-3 py-2 ${day === today ? 'bg-green-50/50' : ''}`}>
+                          {cls ? (
+                            <div className={`px-3 py-2 rounded-lg text-xs ${cls.type === 'Lab'
+                              ? 'bg-purple-100 text-purple-800 border border-purple-200'
+                              : 'bg-green-100 text-green-800 border border-green-200'
+                              }`}>
+                              <div className="font-semibold truncate">{cls.subject}</div>
+                              {cls.venue && (
+                                <div className="text-[10px] opacity-75 mt-1 flex items-center gap-1">
+                                  <MapPin className="w-3 h-3" />
+                                  {cls.venue}
+                                </div>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-gray-300">—</span>
+                          )}
+                        </td>
+                      );
+                    })}
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* Weekly Summary */}
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+          <div className="text-center">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <Calendar className="w-5 h-5 sm:w-6 sm:h-6 text-green-600" />
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stats.totalClasses}</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase tracking-wider font-semibold">Classes/Week</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6">
+          <div className="text-center">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <FlaskConical className="w-5 h-5 sm:w-6 sm:h-6 text-purple-600" />
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stats.labSessions}</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase tracking-wider font-semibold">Labs</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 col-span-2 md:col-span-1">
+          <div className="text-center">
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-50 rounded-full flex items-center justify-center mx-auto mb-2 sm:mb-3">
+              <BookOpen className="w-5 h-5 sm:w-6 sm:h-6 text-blue-600" />
+            </div>
+            <p className="text-2xl sm:text-3xl font-bold text-gray-800">{stats.uniqueCourses}</p>
+            <p className="text-[10px] sm:text-sm text-gray-600 mt-1 uppercase tracking-wider font-semibold">Courses</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Course List for Semester */}
+      <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="bg-gradient-to-r from-emerald-50 to-teal-50 px-6 py-4 border-b">
+          <h3 className="font-semibold text-gray-800">📚 Courses - {selectedSemester}</h3>
+        </div>
+        <div className="p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {Array.from(new Set(
+              Object.values(activeSchedules[selectedSemester] || {})
+                .flat()
+                .map(c => c.subject)
+            )).map((course, idx) => {
+              const courseData = Object.values(activeSchedules[selectedSemester] || {})
+                .flat()
+                .find(c => c.subject === course);
+              const isLab = course.includes('Lab');
+
+              return (
+                <div
+                  key={idx}
+                  className={`p-3 rounded-lg border ${isLab
+                    ? 'bg-purple-50 border-purple-200'
+                    : 'bg-green-50 border-green-200'
+                    }`}
+                >
+                  <div className="flex items-start gap-2">
+                    {isLab ? (
+                      <FlaskConical className="w-4 h-4 text-purple-600 mt-0.5" />
+                    ) : (
+                      <BookOpen className="w-4 h-4 text-green-600 mt-0.5" />
+                    )}
+                    <div>
+                      <p className="font-medium text-gray-800 text-sm">{course}</p>
+                      {courseData?.teacher && (
+                        <p className="text-xs text-gray-600 mt-1">{courseData.teacher}</p>
+                      )}
+                      {courseData?.venue && (
+                        <p className="text-xs text-gray-500">{courseData.venue}</p>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
     </div >
   );
 }
