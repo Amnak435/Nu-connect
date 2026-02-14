@@ -26,8 +26,13 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
 
   // 2. Persistent Memory State (Self-Learning)
   const [learnedSessionData, setLearnedSessionData] = useState<LearnedData[]>(() => {
-    const saved = localStorage.getItem(`nuconnect_buddy_memory_${user?.id || 'guest'}`);
-    return saved ? JSON.parse(saved) : [];
+    try {
+      const saved = localStorage.getItem(`nuconnect_buddy_memory_${user?.id || 'guest'}`);
+      return saved ? JSON.parse(saved) : [];
+    } catch (e) {
+      console.error("Failed to load memory:", e);
+      return [];
+    }
   });
 
   // Sync Memory to LocalStorage
@@ -90,7 +95,14 @@ What should we study today?`
       for (let i = 1; i <= maxPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        const pageText = textContent.items.map((item: any) => (item as any).str).join(' ');
+        const pageText = textContent.items
+          .map((item: any) => {
+            if (typeof item === 'object' && item !== null && 'str' in item) {
+              return (item as { str: string }).str;
+            }
+            return '';
+          })
+          .join(' ');
         fullText += pageText + ' ';
       }
       return fullText;
