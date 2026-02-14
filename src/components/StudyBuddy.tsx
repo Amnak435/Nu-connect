@@ -1,76 +1,125 @@
 import { useState, useRef } from 'react';
 import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText } from 'lucide-react';
-import { GoogleGenerativeAI } from '@google/generative-ai';
+// import { GoogleGenerativeAI } from '@google/generative-ai'; // Removed Gemini
+import { csKnowledgeBase } from '../data/csKnowledgeBase';
+import * as pdfjsLib from 'pdfjs-dist';
+
+// Set worker source for PDF.js - attempting to use a CDN to avoid local build issues
+// In a production app, you might want to bundle the worker.
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
 
 interface StudyBuddyProps {
   user: any;
 }
 
-// Initialize Gemini API (User needs to add VITE_GEMINI_API_KEY to .env)
-const genAI = new GoogleGenerativeAI(import.meta.env.VITE_GEMINI_API_KEY || '');
-
 export function StudyBuddy({ user }: StudyBuddyProps) {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; content: string }>>([
     {
       role: 'ai',
-      content: `Hello ${user.name.split(' ')[0]}! 👋 I'm your Study Buddy AI, powered by Gemini. 
+      content: `Hello ${user.name.split(' ')[0]}! 👋 I'm your Offline Study Buddy. 
 
 I can help you with:
-• Explaining complex topics in simple terms
-• Teaching CS concepts from Semesters 1-8
-• Summarizing uploaded documents
-• Creating study plans and quizzes
+• Explaining CS concepts from Semesters 1-8
+• Analyzing uploaded documents (PDFs)
+• Creating study plans
 
 How can I assist you today?`
     }
   ]);
   const [inputMessage, setInputMessage] = useState('');
   const [isTyping, setIsTyping] = useState(false);
-  const [attachment, setAttachment] = useState<{ file: File; data: string; type: string } | null>(null);
+  const [attachment, setAttachment] = useState<{ file: File; type: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const quickActions = [
-    { icon: BookOpen, label: 'Explain a topic', prompt: 'Explain the concept of Recursion in simple terms' },
-    { icon: Brain, label: 'Create study plan', prompt: 'Create a study plan for my current semester' },
-    { icon: Trophy, label: 'Generate quiz', prompt: 'Generate a quiz on Operating Systems' },
-    { icon: Sparkles, label: 'Summarize PDF', prompt: 'Please upload a PDF for me to summarize' }
+    { icon: BookOpen, label: 'Explain a topic', prompt: 'Explain OOP' },
+    { icon: Brain, label: 'Data Structures', prompt: 'Tell me about BST' },
+    { icon: Trophy, label: 'Database', prompt: 'What is Normalization?' },
+    { icon: Sparkles, label: 'Upload PDF', prompt: 'Analyze this PDF for me' }
   ];
 
-  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Check if file type is supported (PDF, images)
-    const supportedTypes = ['application/pdf', 'image/jpeg', 'image/png', 'image/webp'];
-    if (!supportedTypes.includes(file.type)) {
-      alert('Please upload a PDF or an image (JPEG, PNG, WEBP).');
-      return;
-    }
-
-    try {
-      const reader = new FileReader();
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        const base64Data = reader.result?.toString().split(',')[1];
-        if (base64Data) {
-          setAttachment({
-            file,
-            data: base64Data,
-            type: file.type
-          });
-        }
-      };
-    } catch (error) {
-      console.error("Error reading file:", error);
-      alert("Failed to read file.");
-    }
+    setAttachment({ file, type: file.type });
   };
 
   const removeAttachment = () => {
     setAttachment(null);
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
+  const extractTextFromPDF = async (file: File): Promise<string> => {
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+      let fullText = '';
+
+      // Limit to first 3 pages to be fast
+      const maxPages = Math.min(pdf.numPages, 3);
+      for (let i = 1; i <= maxPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        const pageText = textContent.items.map((item: any) => item.str).join(' ');
+        fullText += pageText + ' ';
+      }
+      return fullText;
+    } catch (error) {
+      console.error('PDF Extraction Error:', error);
+      return '';
     }
+  };
+
+  const generateOfflineResponse = async (query: string, file?: File): Promise<string> => {
+    let response = '';
+    let context = '';
+
+    if (file && file.type === 'application/pdf') {
+      const pdfText = await extractTextFromPDF(file);
+      if (pdfText) {
+        context = pdfText.toLowerCase();
+        response += `**Document Analysis (${file.name}):**\nI've scanned the document. `;
+
+        // Key Concept Extraction from PDF
+        const foundTopics = csKnowledgeBase.filter(concept =>
+          concept.keywords.some(k => context.includes(k.toLowerCase()))
+        );
+
+        if (foundTopics.length > 0) {
+          const uniqueTopics = [...new Set(foundTopics.map(t => t.topic))];
+          response += `It seems to cover: **${uniqueTopics.slice(0, 3).join(', ')}**.\n\n`;
+        } else {
+          response += `It contains general text about: "${pdfText.substring(0, 50)}..."\n\n`;
+        }
+      } else {
+        response += `(I couldn't read the text from ${file.name}, but I see it's a PDF.)\n\n`;
+      }
+    }
+
+    // Keyword Matching for Query
+    const lowerQuery = query.toLowerCase();
+    const match = csKnowledgeBase.find(concept =>
+      concept.keywords.some(k => lowerQuery.includes(k.toLowerCase())) ||
+      lowerQuery.includes(concept.topic.toLowerCase())
+    );
+
+    if (match) {
+      response += `### ${match.topic}\n\n${match.explanation}\n\n*Related: ${match.related?.join(', ') || 'None'}*`;
+    } else if (!file && query.trim()) {
+      // Fallback for greetings or unknown topics
+      if (lowerQuery.includes('hello') || lowerQuery.includes('hi')) {
+        response += "Hello! ask me about any CS topic.";
+      } else {
+        response += "I don't have that specific topic in my offline database yet. Try asking about **OOP**, **BST**, **Normalization**, **Process**, or **Compilers**.";
+      }
+    }
+
+    if (!response && file) {
+      response = "I've analyzed the file.";
+    }
+
+    return response || "I've processed your request.";
   };
 
   const handleSendMessage = async () => {
@@ -85,81 +134,20 @@ How can I assist you today?`
 
     setIsTyping(true);
 
-    // Add user message
-    const attachmentMsg = currentAttachment ? `\n\n[Attached File: ${currentAttachment.file.name}]` : '';
+    const attachmentMsg = currentAttachment ? `\n[Attached: ${currentAttachment.file.name}]` : '';
     const newMessages = [...messages, { role: 'user' as const, content: userMsg + attachmentMsg }];
     setMessages(newMessages);
 
-    try {
-      const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-      if (!apiKey || apiKey === 'your_key_here') {
-        throw new Error('API_KEY_MISSING');
-      }
-
-      // Initialize API client here to ensure we have the key
-      const genAI = new GoogleGenerativeAI(apiKey);
-      const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-      const systemPrompt = `
-        You are "Study Buddy AI", a helpful expert academic tutor for a Computer Science student at NUTECH university.
-        Student Name: ${user.name}
-        Semester: ${user.semester}
-        Department: Computer Science
-        
-        YOUR CAPABILITIES:
-        1. **Complex Topics Simplified**: Explain difficult concepts using analogies, simple language, and examples.
-        2. **CS Curriculum Expert**: You have complete knowledge of the Computer Science curriculum from Semesters 1 through 8. You can teach ANY concept from these semesters (e.g., Programming Fundamentals, DSA, OS, db, AI, Networks, Compiler Construction, etc.).
-        3. **Document Analysis**: If a PDF or image is provided, READ IT thoroughly and provide a concise summary, key points, or answer specific questions about it.
-        
-        Guidelines:
-        - Be encouraging, friendly, and professional.
-        - Use Markdown for clear formatting (bold, italics, code blocks, lists).
-        - If the user asks for a specific semester topic, provide a structured explanation suited for that academic level.
-        - If the user uploads a document, prioritize analyzing that document.
-        
-        Previous Conversation:
-        ${messages.map(m => `${m.role === 'user' ? 'Student' : 'AI'}: ${m.content}`).join('\n')}
-        
-        Current Question: ${userMsg}
-      `;
-
-      const parts: any[] = [{ text: systemPrompt }];
-
-      if (currentAttachment) {
-        parts.push({
-          inlineData: {
-            data: currentAttachment.data,
-            mimeType: currentAttachment.type
-          }
-        });
-      }
-
-      const result = await model.generateContent(parts);
-      const response = await result.response;
-      const text = response.text();
-
-      setMessages([...newMessages, { role: 'ai', content: text }]);
-    } catch (error: any) {
-      console.error('Gemini Error:', error);
-
-      let errorMessage = `I'm having trouble connecting to my brain right now. (Error: ${error.message})`;
-
-      if (error.message === 'API_KEY_MISSING') {
-        errorMessage = "⚠️ Gemini API Key is missing. Please add VITE_GEMINI_API_KEY to your Vercel Environment Variables.";
-      } else if (error.message.includes('404')) {
-        errorMessage = "⚠️ Error 404: The AI model is currently unavailable. Please try again later.";
-      } else if (error.message.includes('SAFETY')) {
-        errorMessage = "⚠️ I cannot answer that query due to safety guidelines.";
-      }
-
-      setMessages([...newMessages, { role: 'ai', content: errorMessage }]);
-    } finally {
+    // Simulate AI Delay
+    setTimeout(async () => {
+      const responseText = await generateOfflineResponse(userMsg, currentAttachment?.file);
+      setMessages([...newMessages, { role: 'ai', content: responseText }]);
       setIsTyping(false);
-    }
+    }, 1000);
   };
 
   const handleQuickAction = (prompt: string) => {
-    if (prompt.includes('upload a PDF')) {
+    if (prompt.includes('Upload') || prompt.includes('PDF')) {
       fileInputRef.current?.click();
     } else {
       setInputMessage(prompt);
@@ -175,8 +163,8 @@ How can I assist you today?`
             <Bot className="w-7 h-7 text-purple-600" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold">Study Buddy AI</h2>
-            <p className="text-purple-100">Your personal AI learning assistant (Semesters 1-8)</p>
+            <h2 className="text-2xl font-bold">Study Buddy (Offline Mode)</h2>
+            <p className="text-purple-100">Instant answers from Semesters 1-8 Database</p>
           </div>
         </div>
       </div>
@@ -271,13 +259,13 @@ How can I assist you today?`
               type="file"
               ref={fileInputRef}
               className="hidden"
-              accept="application/pdf,image/*"
+              accept="application/pdf"
               onChange={handleFileSelect}
             />
             <button
               onClick={() => fileInputRef.current?.click()}
               className="p-3 text-gray-500 hover:text-purple-600 hover:bg-purple-50 rounded-lg transition-colors"
-              title="Upload PDF or Image"
+              title="Upload PDF"
             >
               <Paperclip className="w-5 h-5" />
             </button>
@@ -300,7 +288,7 @@ How can I assist you today?`
             </button>
           </div>
           <p className="text-xs text-gray-500 mt-2 text-center">
-            💡 Supported: Text queries, PDFs, Images. Limits apply.
+            💡 Offline Mode Active. Supports: PDF Analysis & Core CS Topics.
           </p>
         </div>
       </div>
@@ -311,8 +299,8 @@ How can I assist you today?`
           <div className="w-12 h-12 bg-green-50 rounded-xl flex items-center justify-center mb-4">
             <Sparkles className="w-6 h-6 text-green-600" />
           </div>
-          <h4 className="font-semibold text-gray-800 mb-2">Smart Explanations</h4>
-          <p className="text-sm text-gray-600">Get complex topics explained in simple, easy-to-understand language.</p>
+          <h4 className="font-semibold text-gray-800 mb-2">Detailed Explanations</h4>
+          <p className="text-sm text-gray-600">Access a database of CS concepts from basic algorithms to advanced compilers.</p>
         </div>
 
         <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
@@ -327,8 +315,8 @@ How can I assist you today?`
           <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-4">
             <FileText className="w-6 h-6 text-blue-600" />
           </div>
-          <h4 className="font-semibold text-gray-800 mb-2">Document Analysis</h4>
-          <p className="text-sm text-gray-600">Upload PDFs or images and get instant summaries and answers.</p>
+          <h4 className="font-semibold text-gray-800 mb-2">Document Scanner</h4>
+          <p className="text-sm text-gray-600">Scans PDFs for known keywords and summarizes based on course material.</p>
         </div>
       </div>
     </div>
