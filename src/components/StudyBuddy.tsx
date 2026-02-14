@@ -1,9 +1,10 @@
 import { useState, useRef, useEffect } from 'react';
 import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText, Zap, Trash2, Cpu, GraduationCap, ArrowUpRight } from 'lucide-react';
 import { csKnowledgeBase } from '../data/csKnowledgeBase';
+import * as pdfjsLib from 'pdfjs-dist';
 
-// Using a slightly older, more stable PDF worker for maximal compatibility
-const PDF_WORKER_URL = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+// Use the exact version from package.json for the worker
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/5.4.624/pdf.worker.min.js`;
 
 interface StudyBuddyProps {
   user: any;
@@ -40,22 +41,22 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
     setMessages([
       {
         role: 'ai',
-        content: `Hello ${user?.name?.split(' ')[0] || 'there'}! I'm your **Persistent** Study Buddy.
+        content: `Hello ${user?.name?.split(' ')[0] || 'Friend'}! 🎓 I'm your **Advanced Persistent** AI Study Buddy.
 
-I have my core CS database, and I remember everything you teach me from PDF uploads. ${learnedSessionData.length > 0
-            ? `I currently remember **${learnedSessionData.length} documents** from your previous sessions.`
-            : "Upload a PDF, and I'll memorize it for your future sessions!"}
+I memorize everything you upload. ${learnedSessionData.length > 0
+            ? `I'm currently holding knowledge from **${learnedSessionData.length} documents** you taught me before.`
+            : "Upload any PDF, and I'll learn its contents to help you study!"}
 
-What should we study today?`
+What's on our syllabus today?`
       }
     ]);
   }, [user?.name, learnedSessionData.length]);
 
   const quickActions = [
-    { icon: BookOpen, label: 'OOP Concepts', prompt: 'Explain Object Oriented Programming' },
-    { icon: Brain, label: 'Tree Structures', prompt: 'Tell me about Binary Search Trees' },
-    { icon: Trophy, label: 'Database Normalization', prompt: 'What is Database Normalization?' },
-    { icon: Sparkles, label: 'Learn from PDF', prompt: 'LEARN_PDF_TRIGGER' }
+    { icon: BookOpen, label: 'Explain OOP', prompt: 'Explain Object Oriented Programming' },
+    { icon: Brain, label: 'Data Structures', prompt: 'Tell me about Binary Search Trees' },
+    { icon: Trophy, label: 'Database', prompt: 'What is Normalization?' },
+    { icon: Sparkles, label: 'Learn PDF', prompt: 'LEARN_PDF_TRIGGER' }
   ];
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -70,38 +71,35 @@ What should we study today?`
   };
 
   const clearMemory = () => {
-    if (window.confirm("Delete everything I've learned from your documents?")) {
+    if (window.confirm("Should I clear everything I've learned from your documents?")) {
       setLearnedSessionData([]);
       if (typeof window !== 'undefined') {
         localStorage.removeItem(`nuconnect_buddy_memory_${user?.id || 'guest'}`);
       }
-      setMessages(prev => [...prev, { role: 'ai', content: "Memory cleared. Back to basic mode!" }]);
+      setMessages(prev => [...prev, { role: 'ai', content: "Memory wiped. Fresh start!" }]);
     }
   };
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
     try {
-      // Import PDF.js dynamically
-      const pdfjs = await import('pdfjs-dist');
-      // Set worker with specific version worker for stability
-      pdfjs.GlobalWorkerOptions.workerSrc = PDF_WORKER_URL;
-
       const arrayBuffer = await file.arrayBuffer();
-      const loadingTask = pdfjs.getDocument({ data: arrayBuffer });
+      const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
       const pdf = await loadingTask.promise;
       let text = '';
 
-      const maxPages = Math.min(pdf.numPages, 12);
+      const maxPages = Math.min(pdf.numPages, 10);
       for (let i = 1; i <= maxPages; i++) {
         const page = await pdf.getPage(i);
         const textContent = await page.getTextContent();
-        text += textContent.items.map((item: any) => item.str).join(' ') + '\n';
+        const pageText = textContent.items
+          .map((item: any) => (item && typeof item === 'object' && 'str' in item) ? item.str : '')
+          .join(' ');
+        text += pageText + ' ';
       }
       return text.trim();
     } catch (error) {
-      console.error('PDF Read Error:', error);
-      // Fallback: If parsing fails, use the filename to at least give some simulated context
-      return `[SIMULATED CONTEXT FOR ${file.name}] The document appears to be related to its title.`;
+      console.error('PDF Extraction Error:', error);
+      return '';
     }
   };
 
@@ -110,9 +108,9 @@ What should we study today?`
 
     if (file && file.type === 'application/pdf') {
       const pdfText = await extractTextFromPDF(file);
-      if (pdfText && !pdfText.startsWith('[SIMULATED')) {
+      if (pdfText) {
         if (learnedSessionData.some(d => d.fileName === file.name)) {
-          return `I already remember **${file.name}**. I'm ready to answer any questions about it!`;
+          return `I already remember **${file.name}**. What would you like to know about it?`;
         }
 
         setLearnedSessionData(prev => [...prev, {
@@ -121,19 +119,19 @@ What should we study today?`
           timestamp: Date.now()
         }]);
 
-        response += `### 🧠 Memory Acquired!\n\nI've memorized **${file.name}**. I'll remember this content across all your future sessions. `;
+        response += `### 🧠 Long-Term Memory Updated\n\nI've analyzed and memorized **${file.name}**. I'll remember this content even if you refresh or logout! `;
 
         const matchedCoreTopics = csKnowledgeBase.filter(concept =>
           pdfText.toLowerCase().includes(concept.topic.toLowerCase())
         );
 
         if (matchedCoreTopics.length > 0) {
-          response += `This document matches my knowledge of **${matchedCoreTopics[0].topic}**. `;
+          response += `This document matches my core knowledge of **${matchedCoreTopics[0].topic}**. `;
         }
 
-        response += `\n\n**Brief Summary:** ${pdfText.substring(0, 200)}...`;
+        response += `\n\n**Quick Preview:** ${pdfText.substring(0, 200)}...`;
       } else {
-        response = `I've noted the document **${file.name}**. (PDF text extraction is limited in some environments, but I'll do my best to help based on your queries!)`;
+        response = `I've noted the upload of **${file.name}**, but I couldn't extract the text (it might be a scan). I'll remember that you uploaded it!`;
       }
       return response;
     }
@@ -157,15 +155,15 @@ What should we study today?`
         const index = learnedMatch.content.toLowerCase().indexOf(lowerQuery);
         const start = Math.max(0, (index === -1 ? 0 : index) - 100);
         const snippet = learnedMatch.content.substring(start, start + 500);
-        response = `### 📖 From My Memory\n\nI found this in **${learnedMatch.fileName}**:\n\n"...${snippet}..."`;
+        response = `### 📖 From My Memorized Data\n\nI found this in **${learnedMatch.fileName}**:\n\n"...${snippet}..."`;
       }
     }
 
     if (!response) {
       if (lowerQuery.includes('hello') || lowerQuery.includes('hi')) {
-        response = `Hello! I'm your self-learning assistant. I remember **${learnedSessionData.length}** of your files. How can I help?`;
+        response = `Hello! I remember **${learnedSessionData.length}** of your documents. How can I help you today?`;
       } else {
-        response = "I don't have that in my core database or memory yet. Try uploading a PDF about it!";
+        response = "I don't have that in my memory or core database yet. Try uploading a PDF about it!";
       }
     }
 
@@ -189,32 +187,27 @@ What should we study today?`
       const responseText = await generateOfflineResponse(userMsg, currentAttachment?.file);
       setMessages([...newMessages, { role: 'ai' as const, content: responseText }]);
     } catch (e) {
-      setMessages([...newMessages, { role: 'ai' as const, content: "I'm having a little trouble thinking. Try again!" }]);
+      setMessages([...newMessages, { role: 'ai' as const, content: "Sorry, I had a processing error. Please try again." }]);
     } finally { setIsTyping(false); }
   };
 
   return (
-    <div className="flex flex-col h-[680px] bg-white rounded-[2.5rem] shadow-[0_25px_80px_-15px_rgba(0,0,0,0.2)] overflow-hidden border border-emerald-100/50 font-sans transition-all">
-      {/* High-Performance Header */}
-      <div className="bg-[#064e3b] p-7 text-white flex items-center justify-between relative shadow-2xl z-40 border-b border-emerald-500/20">
-        <div className="absolute inset-0 bg-gradient-to-br from-emerald-900 via-emerald-800 to-black opacity-90" />
-        <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-400/10 rounded-full blur-[100px] -mr-20 -mt-20" />
-
-        <div className="flex items-center gap-5 relative z-10">
-          <div className="bg-emerald-50 content-center p-3.5 rounded-3xl shadow-[0_0_20px_rgba(16,185,129,0.3)]">
-            <Cpu className="w-9 h-9 text-emerald-900" />
+    <div className="flex flex-col h-[650px] bg-white rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] overflow-hidden border border-emerald-100 font-sans">
+      {/* Premium Header */}
+      <div className="bg-[#064e3b] p-6 text-white flex items-center justify-between relative shadow-xl z-20">
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="bg-emerald-500/20 p-3 rounded-2xl backdrop-blur-md border border-white/10 shadow-inner">
+            <Cpu className="w-8 h-8 text-emerald-400" />
           </div>
           <div>
-            <h2 className="font-black text-2xl tracking-tight text-white m-0 uppercase flex items-center gap-2">
-              Study Buddy <span className="text-[10px] bg-emerald-500/30 px-2 py-0.5 rounded-md border border-white/20">V2.0</span>
-            </h2>
-            <div className="flex items-center gap-3 mt-1.5">
-              <span className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-wider text-emerald-50 opacity-80">
-                <Zap className="w-3 h-3 fill-emerald-400 text-emerald-400" /> Self-Learning Core
+            <h2 className="font-black text-2xl tracking-tight text-white m-0">Study Buddy AI</h2>
+            <div className="flex items-center gap-2 mt-0.5">
+              <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-widest text-emerald-50 bg-emerald-500/30 px-2.5 py-1 rounded-lg border border-white/10">
+                <Zap className="w-3 h-3 fill-emerald-300" /> Persistent Core
               </span>
               {learnedSessionData.length > 0 && (
-                <span className="text-xs text-white font-black px-2 py-0.5 bg-white/10 rounded-full border border-white/10">
-                  {learnedSessionData.length} Files Learned
+                <span className="text-[10px] text-emerald-100 font-bold bg-white/5 px-2.5 py-0.5 rounded-lg border border-white/5 backdrop-blur-sm">
+                  Knowledge Base: {learnedSessionData.length} Docs
                 </span>
               )}
             </div>
@@ -224,30 +217,28 @@ What should we study today?`
         {learnedSessionData.length > 0 && (
           <button
             onClick={clearMemory}
-            className="p-3.5 hover:bg-red-500/20 rounded-2xl transition-all text-white/80 hover:text-white border border-white/10 hover:border-red-500/30 backdrop-blur-sm group"
-            title="Wipe Memory"
+            className="p-3 hover:bg-white/10 rounded-2xl transition-all text-white/80 hover:text-white border border-white/10 group"
+            title="Clear Memory"
           >
-            <Trash2 className="w-6 h-6" />
+            <Trash2 className="w-6 h-6 group-hover:scale-110 transition-transform" />
           </button>
         )}
       </div>
 
-      {/* Modern Chat Canvas */}
-      <div className="flex-1 overflow-y-auto p-8 space-y-8 bg-[#fdfdfd] relative">
-        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/cubes.png')] opacity-[0.03] pointer-events-none" />
-
+      {/* Messages area */}
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-white to-[#f0f4f2]">
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-5 duration-500`}>
-            <div className={`flex gap-4 max-w-[92%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-              <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border-2 ${msg.role === 'user' ? 'bg-emerald-800 border-emerald-700' : 'bg-white border-emerald-100'
+          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
+            <div className={`flex gap-3 max-w-[88%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-md ${msg.role === 'user' ? 'bg-emerald-700' : 'bg-white border border-emerald-100'
                 }`}>
-                {msg.role === 'user' ? <GraduationCap className="w-7 h-7 text-white" /> : <Bot className="w-7 h-7 text-emerald-800" />}
+                {msg.role === 'user' ? <GraduationCap className="w-6 h-6 text-white" /> : <Bot className="w-6 h-6 text-emerald-700" />}
               </div>
-              <div className={`p-6 rounded-[2.2rem] shadow-sm leading-[1.6] ${msg.role === 'user'
-                  ? 'bg-emerald-800 text-white rounded-tr-none font-bold'
-                  : 'bg-white text-gray-900 border border-emerald-50 rounded-tl-none ring-1 ring-emerald-500/5 antialiased font-semibold tracking-tight'
+              <div className={`p-5 rounded-[2rem] shadow-sm leading-relaxed ${msg.role === 'user'
+                  ? 'bg-emerald-700 text-white rounded-tr-none font-bold'
+                  : 'bg-white text-gray-800 border border-emerald-100 rounded-tl-none ring-1 ring-emerald-500/5'
                 }`}>
-                <div className="text-[15px] whitespace-pre-wrap">
+                <div className="text-sm md:text-[15px] whitespace-pre-wrap font-bold tracking-tight">
                   {msg.content}
                 </div>
               </div>
@@ -256,72 +247,72 @@ What should we study today?`
         ))}
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-white border border-emerald-100 px-7 py-5 rounded-full shadow-xl flex gap-1.5 items-center">
-              <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-bounce [animation-duration:1.2s]" />
-              <div className="w-2.5 h-2.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.2s] [animation-duration:1.2s]" />
-              <div className="w-2.5 h-2.5 bg-emerald-900 rounded-full animate-bounce [animation-delay:0.4s] [animation-duration:1.2s]" />
+            <div className="bg-white border border-emerald-100 px-6 py-4 rounded-full shadow-lg flex gap-1.5 items-center">
+              <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-bounce [animation-duration:1s]" />
+              <div className="w-2.5 h-2.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.2s] [animation-duration:1s]" />
+              <div className="w-2.5 h-2.5 bg-emerald-800 rounded-full animate-bounce [animation-delay:0.4s] [animation-duration:1s]" />
             </div>
           </div>
         )}
       </div>
 
-      {/* Ultra-Modern Action Footer */}
-      <div className="p-8 bg-white border-t border-emerald-50 space-y-5 relative z-20">
+      {/* Quick Actions Bar */}
+      {messages.length < 3 && (
+        <div className="px-6 py-4 flex gap-3 overflow-x-auto no-scrollbar border-t border-emerald-100/30 bg-white/80 backdrop-blur-md relative z-10">
+          {quickActions.map((action, idx) => (
+            <button
+              key={idx}
+              onClick={() => action.prompt === 'LEARN_PDF_TRIGGER' ? fileInputRef.current?.click() : setInputMessage(action.prompt)}
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-white text-emerald-800 rounded-2xl text-[13px] font-black whitespace-nowrap hover:bg-emerald-50 transition-all border border-emerald-100/60 shadow-sm hover:shadow-md hover:-translate-y-0.5"
+            >
+              <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600">
+                <action.icon className="w-4 h-4" />
+              </div>
+              {action.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {/* Premium Input Section */}
+      <div className="p-6 bg-white border-t border-emerald-100/50 space-y-4 shadow-[0_-15px_40px_rgba(0,0,0,0.03)] relative z-20">
         {attachment && (
-          <div className="flex items-center gap-4 p-5 bg-emerald-50 rounded-3xl animate-in zoom-in-95 border border-emerald-100 shadow-inner ring-4 ring-emerald-50/50">
-            <div className="bg-emerald-800 p-3 rounded-2xl text-white shadow-xl shadow-emerald-200">
-              <FileText className="w-6 h-6" />
+          <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-2xl animate-in zoom-in-95 border border-emerald-100 shadow-inner">
+            <div className="bg-emerald-700 p-2.5 rounded-xl text-white shadow-lg">
+              <FileText className="w-5 h-5" />
             </div>
-            <div className="flex flex-col flex-1 truncate">
-              <span className="text-xs font-black text-emerald-600 uppercase tracking-widest">Selected Material</span>
-              <span className="text-base font-black text-emerald-950 truncate">{attachment.file.name}</span>
-            </div>
-            <button onClick={removeAttachment} className="p-3 hover:bg-white rounded-2xl text-red-500 transition-all shadow-sm border border-emerald-100 hover:border-red-100">
-              <X className="w-5 h-5" />
+            <span className="text-sm font-black text-emerald-950 truncate flex-1">{attachment.file.name}</span>
+            <button onClick={removeAttachment} className="p-2.5 hover:bg-red-50 rounded-xl text-emerald-600 hover:text-red-500 transition-all bg-white border border-emerald-100 shadow-sm">
+              <X className="w-4 h-4" />
             </button>
           </div>
         )}
 
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-            {quickActions.map((action, idx) => (
-              <button
-                key={idx}
-                onClick={() => action.prompt === 'LEARN_PDF_TRIGGER' ? fileInputRef.current?.click() : setInputMessage(action.prompt)}
-                className="flex items-center gap-2.5 px-5 py-2.5 bg-emerald-50/30 text-emerald-800 rounded-2xl text-[13px] font-black whitespace-nowrap hover:bg-emerald-100 transition-all border border-emerald-100/40 hover:scale-[1.03] active:scale-95 shadow-sm"
-              >
-                <action.icon className="w-4 h-4" />
-                {action.label}
-              </button>
-            ))}
-          </div>
+        <div className="flex items-center gap-4">
+          <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept=".pdf" className="hidden" />
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="p-5 text-emerald-600 hover:bg-emerald-50 rounded-3xl transition-all border-2 border-emerald-50 hover:border-emerald-200 shadow-sm bg-gray-50/50 active:scale-90"
+            title="Attach PDF"
+          >
+            <Paperclip className="w-6 h-6" />
+          </button>
 
-          <div className="flex items-center gap-4">
-            <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept=".pdf" className="hidden" />
+          <div className="flex-1 relative group">
+            <input
+              type="text"
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
+              placeholder={attachment ? "What should I look for in this file?" : "Ask me anything..."}
+              className="w-full pl-6 pr-16 py-5 bg-gray-50/50 border-2 border-transparent rounded-[2rem] focus:bg-white focus:border-emerald-500/40 focus:ring-[12px] focus:ring-emerald-500/5 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 placeholder:font-black"
+            />
             <button
-              onClick={() => fileInputRef.current?.click()}
-              className="p-5 text-emerald-900 hover:bg-emerald-50 rounded-[1.8rem] transition-all border-2 border-emerald-50 hover:border-emerald-200 bg-emerald-50/20 active:scale-90 shadow-sm"
+              onClick={handleSendMessage}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-4 text-white bg-emerald-700 rounded-[1.5rem] hover:bg-emerald-900 active:scale-95 transition-all shadow-xl shadow-emerald-200 flex items-center gap-2 group-focus-within:bg-emerald-800"
             >
-              <Paperclip className="w-7 h-7" />
+              <Send className="w-6 h-6 fill-current" />
             </button>
-
-            <div className="flex-1 relative group">
-              <input
-                type="text"
-                value={inputMessage}
-                onChange={(e) => setInputMessage(e.target.value)}
-                onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder={attachment ? "What should I look for in this file?" : "Ask me anything..."}
-                className="w-full pl-7 pr-20 py-6 bg-[#f8faf9] border-2 border-transparent rounded-[2.2rem] focus:bg-white focus:border-emerald-600/20 focus:ring-[15px] focus:ring-emerald-500/5 transition-all outline-none font-black text-gray-900 placeholder:text-gray-400 placeholder:font-black shadow-inner"
-              />
-              <button
-                onClick={handleSendMessage}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 p-4 text-white bg-emerald-900 rounded-[1.8rem] hover:bg-black active:scale-95 transition-all shadow-xl shadow-emerald-200 flex items-center gap-2 px-6"
-              >
-                <span className="font-black text-xs uppercase tracking-tighter">Send</span>
-                <ArrowUpRight className="w-5 h-5" />
-              </button>
-            </div>
           </div>
         </div>
       </div>
