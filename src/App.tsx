@@ -181,7 +181,7 @@ export default function App() {
               <img src={nutechLogo} alt="NUTECH" className="w-10 h-10 rounded-lg" />
               <div>
                 <h1 className="text-xl font-bold">NUConnect</h1>
-                <p className="text-xs text-green-100">Your Digital Campus (Offline Ready)</p>
+                <p className="text-xs text-green-100">Your Digital Campus</p>
               </div>
             </div>
 
