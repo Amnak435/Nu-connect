@@ -11,7 +11,7 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
   const [messages, setMessages] = useState<Array<{ role: 'user' | 'ai'; content: string }>>([
     {
       role: 'ai',
-      content: `Hello ${user.name.split(' ')[0]}! 👋 I'm your Offline Study Buddy. 
+      content: `Hello ${user.name.split(' ')[0]}! 👋 I'm your New Offline Study Buddy (Free Mode). 
 
 I can help you with:
 • Explaining CS concepts from Semesters 1-8
