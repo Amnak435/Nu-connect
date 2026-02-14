@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText, Zap, Trash } from 'lucide-react';
+import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText, Zap, Trash2, Cpu, GraduationCap, Layout } from 'lucide-react';
 import { csKnowledgeBase } from '../data/csKnowledgeBase';
 
 interface StudyBuddyProps {
@@ -84,7 +84,6 @@ What should we study today?`
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
     try {
-      // Dynamic import to avoid build errors with modern PDF.js on Vercel
       const pdfjsLib = await import('pdfjs-dist');
       pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
@@ -114,9 +113,7 @@ What should we study today?`
   const generateOfflineResponse = async (query: string, file?: File): Promise<string> => {
     let response = '';
 
-    // 1. Learning Phase (Process Uploads)
     if (file && file.type === 'application/pdf') {
-      setIsTyping(true);
       const pdfText = await extractTextFromPDF(file);
       if (pdfText) {
         if (learnedSessionData.some(d => d.fileName === file.name)) {
@@ -129,27 +126,24 @@ What should we study today?`
           timestamp: Date.now()
         }]);
 
-        response += `### 🧠 Long-Term Memory Updated: ${file.name}\n\nI've analyzed and stored this document in my brain. I will remember this even if you log out and come back later! `;
+        response += `### 🧠 Long-Term Memory Updated\n\nI've analyzed **${file.name}** and stored it in my brain. I'll remember this for our future sessions! `;
 
         const matchedCoreTopics = csKnowledgeBase.filter(concept =>
           pdfText.toLowerCase().includes(concept.topic.toLowerCase())
         );
 
         if (matchedCoreTopics.length > 0) {
-          response += `This document matches my core knowledge about **${matchedCoreTopics[0].topic}**. `;
+          response += `This matches my core brain regarding **${matchedCoreTopics[0].topic}**. `;
         }
 
-        response += `\n\n**Quick Preview:** ${pdfText.substring(0, 200)}...`;
+        response += `\n\n**Quick Preview:** ${pdfText.substring(0, 150)}...`;
       } else {
         response = "I couldn't read that PDF. Please ensure it has clear, selectable text.";
       }
       return response;
     }
 
-    // 2. Retrieval Phase
     const lowerQuery = query.toLowerCase();
-
-    // Check Core Knowledge Base
     const coreMatch = csKnowledgeBase.find(concept =>
       concept.keywords.some(k => lowerQuery.includes(k.toLowerCase())) ||
       lowerQuery.includes(concept.topic.toLowerCase())
@@ -158,7 +152,6 @@ What should we study today?`
     if (coreMatch) {
       response = `### ${coreMatch.topic}\n\n${coreMatch.explanation}\n\n*Related: ${coreMatch.related?.join(', ') || 'None'}*`;
     }
-    // Check Persistent Memory (Self-Learning)
     else if (learnedSessionData.length > 0) {
       const learnedMatch = learnedSessionData.find(doc =>
         doc.content.toLowerCase().includes(lowerQuery) ||
@@ -171,7 +164,7 @@ What should we study today?`
         const end = Math.min(learnedMatch.content.length, start + 500);
         const snippet = learnedMatch.content.substring(start, end);
 
-        response = `### 📖 From My Memorized Data: ${learnedMatch.fileName}\n\nI found this in the documents you taught me:\n\n"...${snippet}..."\n\n*Source: User-Uploaded Memory*`;
+        response = `### 📖 From My Memorized Data\n\nI found this in **${learnedMatch.fileName}**:\n\n"...${snippet}..."\n\n*Source: Your Uploaded Material*`;
       }
     }
 
@@ -213,21 +206,25 @@ What should we study today?`
   };
 
   return (
-    <div className="flex flex-col h-[650px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-green-100 font-sans">
-      {/* Header */}
-      <div className="bg-gradient-to-r from-green-700 via-green-600 to-green-800 p-5 text-white flex items-center justify-between shadow-md">
-        <div className="flex items-center gap-4">
-          <div className="bg-white/20 p-2.5 rounded-xl backdrop-blur-sm">
-            <Brain className="w-7 h-7" />
+    <div className="flex flex-col h-[650px] bg-[#f8faf9] rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] overflow-hidden border border-emerald-100/50 font-sans transition-all">
+      {/* Premium Header */}
+      <div className="bg-gradient-to-br from-emerald-800 via-emerald-700 to-emerald-900 p-6 text-white flex items-center justify-between relative shadow-xl z-30">
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-10 pointer-events-none" />
+
+        <div className="flex items-center gap-4 relative z-10">
+          <div className="bg-white p-3 rounded-2xl shadow-inner-lg border border-white/20">
+            <Cpu className="w-8 h-8 text-emerald-800" />
           </div>
           <div>
-            <h2 className="font-extrabold text-xl tracking-tight">Study Buddy AI</h2>
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-green-50 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
-                <Zap className="w-3 h-3" /> Offline Learn-Mode
+            <h2 className="font-extrabold text-2xl tracking-tight text-white m-0 leading-tight">Study Buddy AI</h2>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
+              <span className="flex items-center gap-1.5 text-[9px] font-black uppercase tracking-[0.1em] text-emerald-50 bg-emerald-400/30 px-2.5 py-1 rounded-lg border border-white/10 backdrop-blur-md">
+                <Zap className="w-3 h-3 fill-emerald-300" /> Offline Memory
               </span>
               {learnedSessionData.length > 0 && (
-                <span className="text-[10px] text-green-200 font-medium">Memory: {learnedSessionData.length} Docs</span>
+                <span className="text-[11px] text-emerald-100 font-bold bg-white/10 px-2 py-0.5 rounded-lg border border-white/5 whitespace-nowrap">
+                  {learnedSessionData.length} Docs Learned
+                </span>
               )}
             </div>
           </div>
@@ -236,28 +233,28 @@ What should we study today?`
         {learnedSessionData.length > 0 && (
           <button
             onClick={clearMemory}
-            className="p-2 hover:bg-red-500/20 rounded-lg transition-colors text-green-100 hover:text-white"
+            className="p-3 hover:bg-white/10 rounded-2xl transition-all text-white/90 hover:text-white border border-white/10 hover:border-white/30 backdrop-blur-sm shadow-lg group"
             title="Clear AI memory"
           >
-            <Trash className="w-5 h-5" />
+            <Trash2 className="w-6 h-6 group-hover:scale-110 transition-transform" />
           </button>
         )}
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto p-6 space-y-5 bg-gray-50/30">
+      <div className="flex-1 overflow-y-auto p-6 space-y-6 bg-gradient-to-b from-white to-[#f0f4f2]">
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
-            <div className={`flex gap-3 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-              <div className={`w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm ${msg.role === 'user' ? 'bg-green-600' : 'bg-white border border-green-100'
+          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-4 duration-500`}>
+            <div className={`flex gap-3 max-w-[90%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-lg border-2 ${msg.role === 'user' ? 'bg-emerald-700 border-emerald-600' : 'bg-white border-emerald-50'
                 }`}>
-                {msg.role === 'user' ? <Trophy className="w-5 h-5 text-white" /> : <Bot className="w-5 h-5 text-green-600" />}
+                {msg.role === 'user' ? <GraduationCap className="w-6 h-6 text-white" /> : <Bot className="w-6 h-6 text-emerald-700" />}
               </div>
-              <div className={`p-4 rounded-2xl shadow-sm ${msg.role === 'user'
-                  ? 'bg-green-600 text-white rounded-tr-none'
-                  : 'bg-white text-gray-800 border border-green-100 rounded-tl-none'
+              <div className={`p-5 rounded-[2rem] shadow-sm leading-relaxed ${msg.role === 'user'
+                  ? 'bg-emerald-700 text-white rounded-tr-none'
+                  : 'bg-white text-gray-800 border border-emerald-100 rounded-tl-none ring-1 ring-emerald-50/50'
                 }`}>
-                <div className="text-sm md:text-base leading-relaxed whitespace-pre-wrap font-medium">
+                <div className="text-sm md:text-[15px] whitespace-pre-wrap font-semibold tracking-tight">
                   {msg.content}
                 </div>
               </div>
@@ -266,10 +263,10 @@ What should we study today?`
         ))}
         {isTyping && (
           <div className="flex justify-start">
-            <div className="bg-white border border-green-100 px-4 py-3 rounded-2xl shadow-sm flex gap-1.5 items-center">
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" />
-              <div className="w-2 h-2 bg-green-500 rounded-full animate-bounce [animation-delay:0.2s]" />
-              <div className="w-2 h-2 bg-green-600 rounded-full animate-bounce [animation-delay:0.4s]" />
+            <div className="bg-white border border-emerald-100 px-6 py-4 rounded-full shadow-lg flex gap-2 items-center">
+              <div className="w-2.5 h-2.5 bg-emerald-400 rounded-full animate-bounce" />
+              <div className="w-2.5 h-2.5 bg-emerald-500 rounded-full animate-bounce [animation-delay:0.2s]" />
+              <div className="w-2.5 h-2.5 bg-emerald-600 rounded-full animate-bounce [animation-delay:0.4s]" />
             </div>
           </div>
         )}
@@ -277,27 +274,31 @@ What should we study today?`
 
       {/* Quick Actions Bar */}
       {messages.length < 3 && (
-        <div className="px-4 py-2 flex gap-2 overflow-x-auto no-scrollbar border-t border-gray-100 bg-white">
+        <div className="px-6 py-4 flex gap-3 overflow-x-auto no-scrollbar border-t border-emerald-100/30 bg-white/60 backdrop-blur-xl relative z-10">
           {quickActions.map((action, idx) => (
             <button
               key={idx}
               onClick={() => action.prompt === 'LEARN_PDF_TRIGGER' ? fileInputRef.current?.click() : setInputMessage(action.prompt)}
-              className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-full text-xs font-semibold whitespace-nowrap hover:bg-green-100 transition-colors border border-green-100"
+              className="flex items-center gap-2.5 px-4 py-2.5 bg-white text-emerald-800 rounded-2xl text-[13px] font-bold whitespace-nowrap hover:bg-emerald-50 transition-all border border-emerald-100/60 shadow-sm hover:shadow-md hover:-translate-y-0.5"
             >
-              <action.icon className="w-3 h-3" />
+              <div className="p-1.5 bg-emerald-50 rounded-lg text-emerald-600">
+                <action.icon className="w-4 h-4" />
+              </div>
               {action.label}
             </button>
           ))}
         </div>
       )}
 
-      {/* Input section */}
-      <div className="p-5 bg-white border-t border-green-100 space-y-4 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)]">
+      {/* Premium Input Section */}
+      <div className="p-6 bg-white border-t border-emerald-100/50 space-y-4 shadow-[0_-15px_40px_rgba(0,0,0,0.04)] relative z-20">
         {attachment && (
-          <div className="flex items-center gap-3 p-3 bg-green-50 rounded-xl animate-in fade-in slide-in-from-bottom-2 border border-green-100">
-            <FileText className="w-5 h-5 text-green-600" />
-            <span className="text-sm font-bold text-green-800 truncate flex-1">{attachment.file.name}</span>
-            <button onClick={removeAttachment} className="p-1.5 hover:bg-green-200 rounded-full text-green-700 transition-colors">
+          <div className="flex items-center gap-3 p-4 bg-emerald-50 rounded-2xl animate-in zoom-in-95 border border-emerald-100 shadow-inner">
+            <div className="bg-emerald-700 p-2.5 rounded-xl text-white shadow-lg">
+              <FileText className="w-5 h-5" />
+            </div>
+            <span className="text-sm font-black text-emerald-950 truncate flex-1">{attachment.file.name}</span>
+            <button onClick={removeAttachment} className="p-2.5 hover:bg-red-50 rounded-xl text-emerald-600 hover:text-red-500 transition-all bg-white border border-emerald-100 shadow-sm">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -313,7 +314,7 @@ What should we study today?`
           />
           <button
             onClick={() => fileInputRef.current?.click()}
-            className="p-3.5 text-gray-500 hover:text-green-600 hover:bg-green-50 rounded-2xl transition-all border border-gray-200 hover:border-green-200 shadow-sm"
+            className="p-5 text-emerald-600 hover:text-emerald-700 hover:bg-emerald-50 rounded-3xl transition-all border-2 border-emerald-50 hover:border-emerald-200 shadow-sm bg-gray-50/50 active:scale-90"
             title="Attach Study Material (PDF)"
           >
             <Paperclip className="w-6 h-6" />
@@ -326,13 +327,13 @@ What should we study today?`
               onChange={(e) => setInputMessage(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
               placeholder={attachment ? "Ask about this file..." : "Ask me anything..."}
-              className="w-full pl-5 pr-14 py-4 bg-gray-50 border-2 border-transparent rounded-2xl focus:bg-white focus:border-green-500/30 focus:ring-4 focus:ring-green-500/5 transition-all outline-none font-medium"
+              className="w-full pl-6 pr-16 py-5 bg-gray-50/50 border-2 border-transparent rounded-[2rem] focus:bg-white focus:border-emerald-500/40 focus:ring-[12px] focus:ring-emerald-500/5 transition-all outline-none font-bold text-gray-900 placeholder:text-gray-400 placeholder:font-bold"
             />
             <button
               onClick={handleSendMessage}
-              className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 text-white bg-green-600 rounded-xl hover:bg-green-700 active:scale-95 transition-all shadow-lg shadow-green-200/50"
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-4 text-white bg-emerald-700 rounded-[1.5rem] hover:bg-emerald-800 active:scale-95 transition-all shadow-xl shadow-emerald-200"
             >
-              <Send className="w-5 h-5" />
+              <Send className="w-6 h-6 fill-current" />
             </button>
           </div>
         </div>
