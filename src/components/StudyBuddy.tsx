@@ -1,10 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText, Database, Trash2 } from 'lucide-react';
+import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText, Zap, Trash } from 'lucide-react';
 import { csKnowledgeBase } from '../data/csKnowledgeBase';
-import * as pdfjsLib from 'pdfjs-dist';
-
-// Set worker source for PDF.js - using CDN for reliable offline/standalone behavior
-pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 interface StudyBuddyProps {
   user: any;
@@ -26,18 +22,18 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
 
   // 2. Persistent Memory State (Self-Learning)
   const [learnedSessionData, setLearnedSessionData] = useState<LearnedData[]>(() => {
+    if (typeof window === 'undefined') return [];
     try {
       const saved = localStorage.getItem(`nuconnect_buddy_memory_${user?.id || 'guest'}`);
       return saved ? JSON.parse(saved) : [];
     } catch (e) {
-      console.error("Failed to load memory:", e);
       return [];
     }
   });
 
   // Sync Memory to LocalStorage
   useEffect(() => {
-    if (user?.id) {
+    if (user?.id && typeof window !== 'undefined') {
       localStorage.setItem(`nuconnect_buddy_memory_${user.id}`, JSON.stringify(learnedSessionData));
     }
   }, [learnedSessionData, user?.id]);
@@ -79,13 +75,19 @@ What should we study today?`
   const clearMemory = () => {
     if (window.confirm("Are you sure you want me to forget everything I've learned from your PDFs?")) {
       setLearnedSessionData([]);
-      localStorage.removeItem(`nuconnect_buddy_memory_${user?.id || 'guest'}`);
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem(`nuconnect_buddy_memory_${user?.id || 'guest'}`);
+      }
       setMessages(prev => [...prev, { role: 'ai', content: "Memory cleared. My brain is now back to its default state." }]);
     }
   };
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
     try {
+      // Dynamic import to avoid build errors with modern PDF.js on Vercel
+      const pdfjsLib = await import('pdfjs-dist');
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
+
       const arrayBuffer = await file.arrayBuffer();
       const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
       const pdf = await loadingTask.promise;
@@ -97,10 +99,7 @@ What should we study today?`
         const textContent = await page.getTextContent();
         const pageText = textContent.items
           .map((item: any) => {
-            if (typeof item === 'object' && item !== null && 'str' in item) {
-              return (item as { str: string }).str;
-            }
-            return '';
+            return (item && typeof item === 'object' && 'str' in item) ? item.str : '';
           })
           .join(' ');
         fullText += pageText + ' ';
@@ -117,6 +116,7 @@ What should we study today?`
 
     // 1. Learning Phase (Process Uploads)
     if (file && file.type === 'application/pdf') {
+      setIsTyping(true);
       const pdfText = await extractTextFromPDF(file);
       if (pdfText) {
         if (learnedSessionData.some(d => d.fileName === file.name)) {
@@ -202,9 +202,14 @@ What should we study today?`
     const newMessages = [...messages, { role: 'user' as const, content: fullUserMsg }];
     setMessages(newMessages);
 
-    const responseText = await generateOfflineResponse(userMsg, currentAttachment?.file);
-    setMessages([...newMessages, { role: 'ai' as const, content: responseText }]);
-    setIsTyping(false);
+    try {
+      const responseText = await generateOfflineResponse(userMsg, currentAttachment?.file);
+      setMessages([...newMessages, { role: 'ai' as const, content: responseText }]);
+    } catch (e) {
+      setMessages([...newMessages, { role: 'ai' as const, content: "Sorry, I had trouble processing that. Please try again." }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   return (
@@ -219,10 +224,10 @@ What should we study today?`
             <h2 className="font-extrabold text-xl tracking-tight">Study Buddy AI</h2>
             <div className="flex items-center gap-2">
               <span className="flex items-center gap-1.5 text-[10px] font-bold uppercase text-green-50 bg-white/10 px-2.5 py-1 rounded-full border border-white/10">
-                <Database className="w-3 h-3" /> Offline Memory Mode
+                <Zap className="w-3 h-3" /> Offline Learn-Mode
               </span>
               {learnedSessionData.length > 0 && (
-                <span className="text-[10px] text-green-200 font-medium">Knowledge Base: {learnedSessionData.length} Docs</span>
+                <span className="text-[10px] text-green-200 font-medium">Memory: {learnedSessionData.length} Docs</span>
               )}
             </div>
           </div>
@@ -234,7 +239,7 @@ What should we study today?`
             className="p-2 hover:bg-red-500/20 rounded-lg transition-colors text-green-100 hover:text-white"
             title="Clear AI memory"
           >
-            <Trash2 className="w-5 h-5" />
+            <Trash className="w-5 h-5" />
           </button>
         )}
       </div>
