@@ -173,10 +173,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* DEPLOYMENT VERIFICATION BANNER */}
-      <div className="bg-yellow-400 text-black text-center py-2 font-bold text-sm uppercase tracking-widest shadow-md">
-        ⚠️ Version: Offline Study Buddy v2.0 Live (If you see this, update worked!) ⚠️
-      </div>
       {/* Header */}
       <header className="bg-gradient-to-r from-green-600 to-green-800 text-white shadow-lg sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
