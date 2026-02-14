@@ -100,7 +100,7 @@ export function Fees({ user }: { user: any }) {
                     semester: user.semester,
                     batch: user.batch || '2024',
                     section: user.section || 'N/A',
-                    amount: feeStructure?.amount || 85000,
+                    amount: feeStructure?.amount || 145000,
                     file_url: publicUrl,
                     status: 'pending'
                 }]);
@@ -183,7 +183,7 @@ export function Fees({ user }: { user: any }) {
                         </CardHeader>
                         <CardContent>
                             <div className="flex flex-col items-center justify-center space-y-4 py-6">
-                                <div className="text-4xl font-bold">Rs. {feeStructure?.amount?.toLocaleString() || '85,000'}</div>
+                                <div className="text-4xl font-bold">Rs. {feeStructure?.amount?.toLocaleString() || '145,000'}</div>
                                 <div className="flex items-center gap-2">
                                     <span className="text-gray-600 font-medium">Status:</span>
                                     {status === 'verified' && <Badge className="bg-green-600 hover:bg-green-700">Paid & Verified</Badge>}

@@ -27,9 +27,9 @@ export function DateSheet({ user }: DateSheetProps) {
       .select('*')
       .eq('category', 'datesheet')
       .eq('sub_category', examType === 'midterm' ? 'midterm' : 'final')
-      .eq('semester', '4th Semester') // Use 4th Semester as master
-      .eq('batch', '2024')
-      .or(`section.eq.B,section.eq.All`)
+      .eq('semester', user.semester)
+      .eq('batch', user.batch || '2024')
+      .or(`section.eq.${user.section || 'A'},section.eq.All`)
       .order('created_at', { ascending: false })
       .limit(1);
 

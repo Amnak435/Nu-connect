@@ -38,7 +38,7 @@ export function AdminPanel() {
     const [feeForm, setFeeForm] = useState({
         semester: '1st Semester',
         batch: '2024',
-        amount: 85000,
+        amount: 145000,
         due_date: new Date().toISOString().split('T')[0]
     });
 
