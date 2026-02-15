@@ -154,35 +154,6 @@ export function Login({ onLogin }: LoginProps) {
     }
   };
 
-  const handleEmergencyReset = async () => {
-    const email = loginData.email.trim();
-    if (!email) {
-      setError('Please enter your email first');
-      return;
-    }
-
-    setIsLoading(true);
-    setError('');
-    setSuccess('');
-
-    try {
-      // Calls the SQL function we created
-      const { error } = await supabase.rpc('handle_password_reset', {
-        user_email: email,
-        new_password: 'Nutech@2026'
-      });
-
-      if (error) {
-        throw error;
-      }
-
-      setSuccess('Your password has been reset to: Nutech@2026. You can log in now!');
-    } catch (err: any) {
-      setError('Emergency reset failed. Make sure you ran the SQL setup in Supabase.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   const handleForgotPassword = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -224,20 +195,6 @@ export function Login({ onLogin }: LoginProps) {
     }
   };
 
-  // Demo login handler (for testing without Supabase)
-  const handleDemoLogin = () => {
-    onLogin({
-      id: 'demo-user',
-      email: 'demo@nutech.edu.pk',
-      name: 'Demo Student',
-      registrationNo: 'NUTECH-CS-2024-001',
-      department: 'Computer Science',
-      batch: '2024',
-      section: 'A',
-      semester: '4th Semester',
-      role: 'Student',
-    });
-  };
 
   const renderLoginForm = () => (
     <form onSubmit={handleLogin} className="space-y-4">
@@ -284,20 +241,13 @@ export function Login({ onLogin }: LoginProps) {
         </div>
       </div>
 
-      <div className="flex justify-between items-center mt-1">
+      <div className="flex justify-start items-center mt-1">
         <button
           type="button"
           onClick={() => setMode('forgot-password')}
           className="text-xs text-green-600 hover:text-green-700 hover:underline"
         >
           Forgot Password?
-        </button>
-        <button
-          type="button"
-          onClick={handleEmergencyReset}
-          className="text-xs text-red-600 hover:text-red-700 hover:underline font-medium"
-        >
-          Emergency Fix (No Email)
         </button>
       </div>
 
@@ -316,22 +266,6 @@ export function Login({ onLogin }: LoginProps) {
         )}
       </button>
 
-      <div className="relative my-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200"></div>
-        </div>
-        <div className="relative flex justify-center text-sm">
-          <span className="px-2 bg-white text-gray-500">or</span>
-        </div>
-      </div>
-
-      <button
-        type="button"
-        onClick={handleDemoLogin}
-        className="w-full bg-gray-100 text-gray-700 py-3 px-4 rounded-lg hover:bg-gray-200 transition-colors font-medium"
-      >
-        Continue with Demo Account
-      </button>
 
       <p className="text-center text-sm text-gray-600 mt-4">
         Don't have an account?{' '}
