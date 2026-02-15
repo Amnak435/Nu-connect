@@ -210,32 +210,32 @@ What should we master today?`
   };
 
   return (
-    <div className="flex flex-col h-[75vh] sm:h-[650px] bg-white rounded-2xl sm:rounded-[2rem] shadow-2xl overflow-hidden border border-emerald-100/50 w-full max-w-4xl mx-auto relative">
+    <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col h-[75vh] sm:h-[650px] w-full max-w-4xl mx-auto relative divide-y divide-gray-50">
       {/* Key Modal */}
       {showKeyModal && (
-        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-3xl p-6 sm:p-8 w-full max-w-md shadow-2xl animate-in zoom-in-95">
+        <div className="absolute inset-0 bg-gray-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl p-6 sm:p-8 w-full max-w-md shadow-2xl animate-in zoom-in-95 border border-gray-100">
             <div className="flex items-center gap-3 mb-6">
-              <div className="bg-emerald-100 p-3 rounded-2xl">
-                <Key className="w-6 h-6 text-emerald-800" />
+              <div className="bg-green-50 p-3 rounded-lg">
+                <Key className="w-6 h-6 text-green-700" />
               </div>
-              <h3 className="text-xl font-black text-emerald-950">AI Settings</h3>
+              <h3 className="text-xl font-bold text-gray-800">AI Settings</h3>
             </div>
-            <p className="text-sm text-gray-600 mb-6 font-bold leading-relaxed">
-              Enter your Google Gemini API Key to enable dynamic document analysis and reasoning.
+            <p className="text-sm text-gray-600 mb-6 leading-relaxed">
+              Enter your OpenRouter API Key to enable advanced AI models like Gemini, Claude, or GPT-4o for your documents.
             </p>
             <input
               type="password"
-              placeholder="Paste AI Key here..."
+              placeholder="Paste API Key here..."
               defaultValue={apiKey}
               onKeyDown={(e) => e.key === 'Enter' && saveApiKey((e.target as HTMLInputElement).value)}
-              className="w-full p-4 bg-gray-50 border-2 border-emerald-100 rounded-2xl mb-4 focus:border-emerald-500 outline-none transition-all font-mono text-sm"
+              className="w-full p-4 bg-gray-50 border border-gray-100 rounded-lg mb-4 focus:ring-2 focus:ring-green-500/20 outline-none transition-all font-mono text-sm"
               id="api-key-input"
             />
             <div className="flex gap-3">
               <button
                 onClick={() => setShowKeyModal(false)}
-                className="flex-1 py-4 text-emerald-900 font-black hover:bg-gray-100 rounded-2xl transition-all"
+                className="flex-1 py-3 text-gray-600 font-semibold hover:bg-gray-100 rounded-lg transition-all"
               >
                 Cancel
               </button>
@@ -244,9 +244,9 @@ What should we master today?`
                   const val = (document.getElementById('api-key-input') as HTMLInputElement).value;
                   saveApiKey(val);
                 }}
-                className="flex-1 py-4 bg-emerald-800 text-white font-black rounded-2xl shadow-lg hover:bg-emerald-700 transition-all"
+                className="flex-1 py-3 bg-green-700 text-white font-bold rounded-lg shadow-md hover:bg-green-800 transition-all"
               >
-                Save Changes
+                Save Key
               </button>
             </div>
           </div>
@@ -254,44 +254,44 @@ What should we master today?`
       )}
 
       {/* Header */}
-      <div className="bg-[#064e3b] p-4 sm:p-6 text-white flex items-center justify-between relative shadow-xl z-20">
-        <div className="flex items-center gap-3 sm:gap-4">
-          <div className="bg-emerald-50 p-2 sm:p-3 rounded-xl sm:rounded-2xl shadow-inner">
-            <Cpu className="w-6 h-6 sm:w-8 sm:h-8 text-emerald-900" />
+      <div className="bg-gradient-to-r from-green-600 to-green-800 p-4 sm:p-5 text-white flex items-center justify-between relative shadow-md">
+        <div className="flex items-center gap-3">
+          <div className="bg-white/10 p-2.5 rounded-lg backdrop-blur-sm border border-white/20">
+            <Cpu className="w-6 h-6 text-white" />
           </div>
           <div>
-            <h2 className="font-black text-lg sm:text-2xl tracking-tighter text-white m-0 uppercase leading-none">STUDY BUDDY AI</h2>
-            <div className="flex items-center gap-1.5 sm:gap-2 mt-1 sm:mt-2">
-              <span className={`flex items-center gap-1 text-[8px] sm:text-[10px] font-black uppercase tracking-widest px-2 py-0.5 sm:py-1 rounded-lg border ${apiKey ? 'bg-emerald-500/20 text-emerald-100 border-white/10' : 'bg-red-500/20 text-red-100 border-red-500/30'}`}>
-                {apiKey ? <Zap className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-emerald-400" /> : <AlertCircle className="w-2.5 h-2.5" />}
-                {apiKey ? 'API Active' : 'Offline Mode'}
+            <h2 className="font-bold text-lg sm:text-xl tracking-tight text-white leading-none">Study Buddy AI</h2>
+            <div className="flex items-center gap-2 mt-1.5">
+              <span className={`inline-flex items-center gap-1 text-[9px] uppercase font-bold tracking-wider px-2 py-0.5 rounded-full border backdrop-blur-sm ${apiKey ? 'bg-white/20 text-white border-white/30' : 'bg-red-500/20 text-white border-red-500/30'}`}>
+                {apiKey ? <Zap className="w-2.5 h-2.5 fill-white" /> : <AlertCircle className="w-2.5 h-2.5" />}
+                {apiKey ? 'AI Enabled' : 'Local Mode'}
               </span>
             </div>
           </div>
         </div>
 
         <div className="flex gap-2">
-          <button onClick={() => setShowKeyModal(true)} className="p-2 sm:p-3 hover:bg-white/10 rounded-xl transition-all text-white/80 border border-white/10">
-            <Settings className="w-5 h-5 sm:w-6 sm:h-6" />
+          <button onClick={() => setShowKeyModal(true)} className="p-2 bg-white/10 hover:bg-white/20 rounded-lg backdrop-blur-sm transition-colors text-white border border-white/10 shadow-sm" title="AI Settings">
+            <Settings className="w-5 h-5 text-white" />
           </button>
           {learnedSessionData.length > 0 && (
-            <button onClick={() => { if (confirm("Clear memory?")) setLearnedSessionData([]); }} className="p-2 sm:p-3 hover:bg-black/20 rounded-xl transition-all text-white/80 border border-white/10">
-              <Trash2 className="w-5 h-5 sm:w-6 sm:h-6" />
+            <button onClick={() => { if (confirm("Clear memory?")) setLearnedSessionData([]); }} className="p-2 bg-white/10 hover:bg-white/20 rounded-lg backdrop-blur-sm transition-colors text-white border border-white/10 shadow-sm" title="Clear Memory">
+              <Trash2 className="w-5 h-5" />
             </button>
           )}
         </div>
       </div>
 
-      {/* Chat */}
-      <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-4 sm:space-y-8 bg-[#fdfdfd]">
+      {/* Chat Messages */}
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-6 bg-white scrollbar-thin scrollbar-thumb-gray-200">
         {messages.map((msg, i) => (
-          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2`}>
-            <div className={`flex gap-2 sm:gap-4 max-w-[95%] sm:max-w-[88%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-              <div className={`w-8 h-8 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl flex items-center justify-center shrink-0 shadow-lg border-2 ${msg.role === 'user' ? 'bg-emerald-800 border-emerald-700' : 'bg-white border-emerald-50'}`}>
-                {msg.role === 'user' ? <Trophy className="w-5 h-5 sm:w-7 sm:h-7 text-white" /> : <Bot className="w-5 h-5 sm:w-7 sm:h-7 text-emerald-800" />}
+          <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
+            <div className={`flex gap-3 max-w-[90%] sm:max-w-[80%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 shadow-sm border ${msg.role === 'user' ? 'bg-green-700 border-green-800' : 'bg-gray-100 border-gray-200'}`}>
+                {msg.role === 'user' ? <Trophy className="w-5 h-5 text-white" /> : <Bot className="w-5 h-5 text-green-700" />}
               </div>
-              <div className={`p-3 sm:p-5 rounded-2xl sm:rounded-[2rem] shadow-sm leading-relaxed ${msg.role === 'user' ? 'bg-emerald-800 text-white rounded-tr-none' : 'bg-white text-gray-900 border border-emerald-100 rounded-tl-none font-bold'}`}>
-                <div className="text-xs sm:text-[15px] whitespace-pre-wrap tracking-tight">
+              <div className={`p-4 rounded-xl shadow-sm text-sm ${msg.role === 'user' ? 'bg-green-700 text-white rounded-tr-none' : 'bg-gray-50 text-gray-800 border border-gray-100 rounded-tl-none'}`}>
+                <div className="prose prose-sm prose-green max-w-none whitespace-pre-wrap leading-relaxed font-medium">
                   {msg.content}
                 </div>
               </div>
@@ -300,22 +300,25 @@ What should we master today?`
         ))}
         {isTyping && (
           <div className="flex justify-start">
-            <div className="flex gap-1.5 p-3 bg-emerald-50/50 rounded-full animate-pulse border border-emerald-100">
-              <div className="w-1.5 h-1.5 bg-emerald-600 rounded-full animate-bounce" />
-              <div className="w-1.5 h-1.5 bg-emerald-800 rounded-full animate-bounce [animation-delay:0.2s]" />
+            <div className="flex gap-1.5 p-3 px-4 bg-gray-50 rounded-full border border-gray-100 shadow-sm">
+              <div className="w-1.5 h-1.5 bg-green-400 rounded-full animate-bounce" />
+              <div className="w-1.5 h-1.5 bg-green-600 rounded-full animate-bounce [animation-delay:0.2s]" />
+              <div className="w-1.5 h-1.5 bg-green-800 rounded-full animate-bounce [animation-delay:0.4s]" />
             </div>
           </div>
         )}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Footer */}
-      <div className="p-4 sm:p-6 bg-white border-t border-emerald-50 space-y-3 sm:space-y-4">
+      {/* Footer / Input */}
+      <div className="p-4 sm:p-6 bg-gray-50/50 space-y-4">
         {attachment && (
-          <div className="flex items-center gap-3 p-3 bg-emerald-50 rounded-xl border border-emerald-100">
-            <FileText className="w-4 h-4 text-emerald-800" />
-            <span className="text-xs font-black text-emerald-950 truncate flex-1">{attachment.file.name}</span>
-            <button onClick={() => setAttachment(null)} className="p-1 hover:bg-white rounded-lg text-red-500">
+          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 shadow-sm animate-in zoom-in-95">
+            <div className="bg-green-50 p-2 rounded-md text-green-700">
+              <FileText className="w-4 h-4" />
+            </div>
+            <span className="text-xs font-semibold text-gray-700 truncate flex-1">{attachment.file.name}</span>
+            <button onClick={() => setAttachment(null)} className="p-1.5 hover:bg-gray-100 rounded-md text-red-500 transition-colors">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -323,19 +326,27 @@ What should we master today?`
 
         <div className="flex flex-col gap-3">
           {messages.length < 3 && (
-            <div className="flex gap-2 overflow-x-auto no-scrollbar">
+            <div className="flex gap-2 overflow-x-auto no-scrollbar py-1">
               {quickActions.map((a, idx) => (
-                <button key={idx} onClick={() => a.prompt === 'GEMINI_SETTINGS' ? setShowKeyModal(true) : setInputMessage(a.prompt)} className="flex items-center gap-2 px-3 sm:px-4 py-1.5 bg-[#f8faf9] text-emerald-900 rounded-xl text-[10px] sm:text-[13px] font-black whitespace-nowrap border border-emerald-100 hover:bg-emerald-50 transition-all">
-                  <a.icon className="w-3 h-3 sm:w-4 sm:h-4 text-emerald-600" /> {a.label}
+                <button
+                  key={idx}
+                  onClick={() => a.prompt === 'GEMINI_SETTINGS' ? setShowKeyModal(true) : setInputMessage(a.prompt)}
+                  className="flex items-center gap-2 px-4 py-2 bg-white text-gray-700 rounded-lg text-xs font-bold whitespace-nowrap border border-gray-100 shadow-sm hover:border-green-300 hover:text-green-700 transition-all"
+                >
+                  <a.icon className="w-3.5 h-3.5 text-green-600" /> {a.label}
                 </button>
               ))}
             </div>
           )}
 
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-3">
             <input type="file" ref={fileInputRef} onChange={handleFileSelect} accept=".pdf" className="hidden" />
-            <button onClick={() => fileInputRef.current?.click()} className="p-3 sm:p-5 text-emerald-900 hover:bg-emerald-50 rounded-xl sm:rounded-[1.8rem] transition-all border-2 border-emerald-50">
-              <Paperclip className="w-5 h-5 sm:w-6 sm:h-6" />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="p-3.5 text-gray-500 hover:text-green-700 bg-white hover:bg-green-50 rounded-lg transition-all border border-gray-100 shadow-sm group"
+              title="Attach PDF"
+            >
+              <Paperclip className="w-5 h-5 group-hover:scale-110 transition-transform" />
             </button>
             <div className="flex-1 relative">
               <input
@@ -343,11 +354,15 @@ What should we master today?`
                 value={inputMessage}
                 onChange={(e) => setInputMessage(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleSendMessage()}
-                placeholder={attachment ? "Ask AI about file..." : "Ask me anything..."}
-                className="w-full pl-4 pr-12 sm:pl-7 sm:pr-16 py-3.5 sm:py-5 bg-[#f8faf9] border-2 border-emerald-50 rounded-xl sm:rounded-[2rem] focus:bg-white focus:border-emerald-600/30 transition-all outline-none font-bold text-xs sm:text-base"
+                placeholder={attachment ? "Ask about your PDF..." : "Ask your study buddy..."}
+                className="w-full pl-5 pr-14 py-4 bg-white border border-gray-100 rounded-lg focus:ring-2 focus:ring-green-500/10 focus:border-green-500 outline-none transition-all shadow-sm font-medium"
               />
-              <button onClick={handleSendMessage} className="absolute right-1.5 top-1/2 -translate-y-1/2 p-2 sm:p-3.5 text-white bg-emerald-800 rounded-lg sm:rounded-[1.5rem] hover:bg-[#064e3b] shadow-lg flex items-center justify-center">
-                <Send className="w-4 h-4 sm:w-6 sm:h-6 fill-current" />
+              <button
+                onClick={handleSendMessage}
+                disabled={!inputMessage.trim() && !attachment}
+                className="absolute right-2 top-1/2 -translate-y-1/2 p-2.5 text-white bg-green-700 rounded-md hover:bg-green-800 transition-colors shadow-md disabled:opacity-50 disabled:grayscale"
+              >
+                <Send className="w-5 h-5 fill-current" />
               </button>
             </div>
           </div>
