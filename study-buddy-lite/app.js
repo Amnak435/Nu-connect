@@ -145,13 +145,90 @@ function displayResult(topic) {
 }
 
 function showNotFound() {
+    const query = searchInput.value;
+    const apiKey = localStorage.getItem('openrouter_api_key');
+
+    if (!apiKey) {
+        answerContainer.innerHTML = `
+            <div class="card">
+                <h2>Not Found</h2>
+                <p>I couldn't find that exact question. Try searching for **Agile**, **SDLC**, or **Virtual Memory**.</p>
+                <div class="micro-card" style="margin-top: 1rem; background: rgba(16, 185, 129, 0.1);">
+                    <p>💡 <strong>Pro Tip:</strong> Add an OpenRouter API Key in settings to enable Advanced AI search!</p>
+                </div>
+            </div>
+        `;
+    } else {
+        answerContainer.innerHTML = `
+            <div class="card">
+                <h2>Thinking...</h2>
+                <p>I couldn't find matches in my offline database. Asking the Global AI Core...</p>
+                <div class="loading-spinner"></div>
+            </div>
+        `;
+        callOpenRouter(query, apiKey);
+    }
+    relatedContainer.classList.add('hidden');
+}
+
+async function callOpenRouter(query, apiKey) {
+    try {
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${apiKey}`,
+                "HTTP-Referer": window.location.origin,
+                "X-Title": "Study Buddy Lite",
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                "model": "openrouter/free",
+                "messages": [
+                    {
+                        "role": "system",
+                        "content": "You are a helpful Computer Science Study Buddy. Provide concise, accurate academic explanations. Use markdown."
+                    },
+                    {
+                        "role": "user",
+                        "content": query
+                    }
+                ]
+            })
+        });
+
+        const data = await response.json();
+        if (data.choices && data.choices[0].message) {
+            const aiContent = data.choices[0].message.content;
+            displayAIResult(query, aiContent);
+        } else {
+            throw new Error("Invalid response");
+        }
+    } catch (err) {
+        answerContainer.innerHTML = `
+            <div class="card error-card">
+                <h2>AI Connection Failed</h2>
+                <p>Check your API key or internet connection. Falling back to offline mode.</p>
+            </div>
+        `;
+    }
+}
+
+function displayAIResult(query, content) {
     answerContainer.innerHTML = `
-        <div class="card">
-            <h2>Not Found</h2>
-            <p>I couldn't find that exact question. Try searching for **Agile**, **SDLC**, or **Virtual Memory**.</p>
+        <div class="card answer-card ai-card">
+            <div class="topic-meta">Global AI Core</div>
+            <h2>
+                ${query}
+                <div class="card-actions">
+                    <button class="tts-btn" onclick="speakText('${content.replace(/'/g, "\\'")}')" aria-label="Read Aloud">🔊</button>
+                </div>
+            </h2>
+            <div class="micro-card accent-card">
+                <p>${content}</p>
+            </div>
+            <div class="complexity-badge">Powered by OpenRouter/Free</div>
         </div>
     `;
-    relatedContainer.classList.add('hidden');
 }
 
 function resetUI() {
@@ -182,6 +259,17 @@ simpleToggle.addEventListener('click', () => {
     isSimpleMode = !isSimpleMode;
     simpleToggle.style.background = isSimpleMode ? '#10b981' : 'rgba(255,255,255,0.1)';
     if (searchInput.value) handleSearch(searchInput.value);
+});
+
+const settingsBtn = document.getElementById('settings-btn');
+
+settingsBtn.addEventListener('click', () => {
+    const currentKey = localStorage.getItem('openrouter_api_key') || '';
+    const newKey = prompt('Enter your OpenRouter API Key:', currentKey);
+    if (newKey !== null) {
+        localStorage.setItem('openrouter_api_key', newKey.trim());
+        if (newKey) alert('API Key Saved! AI Core Enabled.');
+    }
 });
 
 document.querySelectorAll('.topic-pill').forEach(pill => {

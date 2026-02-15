@@ -142,7 +142,7 @@ ${!apiKey ? '💡 *Using built-in knowledge mode. Connect an API Key in Settings
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            "model": "google/gemini-2.0-pro-exp-02-05:free", // Use free tier by default
+            "model": "openrouter/free", // Use OpenRouter's auto-free selection
             "messages": [
               {
                 "role": "system",
