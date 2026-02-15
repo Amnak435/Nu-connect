@@ -54,7 +54,7 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
         role: 'ai',
         content: `Hello ${user?.name?.split(' ')[0] || 'Friend'}! 🎓 I'm your **Multi-Engine** Study Buddy.
 
-I now support **OpenRouter**! ${apiKey ? "🚀 **Global AI Active:** I can think using the world's best models." : "💡 **Architecture Update:** Set your OpenRouter API Key in 'Settings' to use Gemini, Claude, or Llama for your PDFs!"}
+🚀 **AI Core Active:** I'm connected and ready to help you master your courses. You can ask me anything or upload a PDF to start learning!
 
 What should we master today?`
       }
@@ -62,9 +62,9 @@ What should we master today?`
   }, [user?.name, learnedSessionData.length, !!apiKey]);
 
   const quickActions = [
-    { icon: Globe, label: 'OpenRouter Setup', prompt: 'OPENROUTER_DASHBOARD' },
     { icon: BookOpen, label: 'Explain OOP', prompt: 'Explain Object Oriented Programming' },
-    { icon: Sparkles, label: 'Set API Key', prompt: 'GEMINI_SETTINGS' }
+    { icon: Brain, label: 'Data Structures', prompt: 'Summarize Binary Search Trees' },
+    { icon: Cpu, label: 'OS Concepts', prompt: 'What is Virtual Memory?' }
   ];
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
