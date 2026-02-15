@@ -1,8 +1,7 @@
 import { useState, useRef, useEffect } from 'react';
-import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText, Zap, Trash2, Cpu, Settings, Key, AlertCircle } from 'lucide-react';
+import { Bot, Send, Sparkles, BookOpen, Brain, Trophy, Paperclip, X, FileText, Zap, Trash2, Cpu, Settings, Key, AlertCircle, Globe } from 'lucide-react';
 import { csKnowledgeBase } from '../data/csKnowledgeBase';
 import * as pdfjsLib from 'pdfjs-dist';
-import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Reliable worker for PDF extraction
 pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.10.38/pdf.worker.min.mjs`;
@@ -23,7 +22,7 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [attachment, setAttachment] = useState<{ file: File; type: string } | null>(null);
   const [showKeyModal, setShowKeyModal] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('nuconnect_gemini_key') || '');
+  const [apiKey, setApiKey] = useState(() => localStorage.getItem('nuconnect_openrouter_key') || '');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
@@ -49,9 +48,9 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
     setMessages([
       {
         role: 'ai',
-        content: `Hello ${user?.name?.split(' ')[0] || 'Friend'}! 🎓 I'm your **Hybrid** Study Buddy.
+        content: `Hello ${user?.name?.split(' ')[0] || 'Friend'}! 🎓 I'm your **Multi-Engine** Study Buddy.
 
-I have a built-in CS database, but I can also learn from your PDFs. ${apiKey ? "✨ **AI Power Active:** I'm using Gemini to analyze your documents." : "⚠️ **Pro Tip:** Set your Gemini API Key in 'Settings' to unlock advanced tutoring for your uploaded files!"}
+I now support **OpenRouter**! ${apiKey ? "🚀 **Global AI Active:** I can think using the world's best models." : "💡 **Architecture Update:** Set your OpenRouter API Key in 'Settings' to use Gemini, Claude, or Llama for your PDFs!"}
 
 What should we master today?`
       }
@@ -59,8 +58,8 @@ What should we master today?`
   }, [user?.name, learnedSessionData.length, !!apiKey]);
 
   const quickActions = [
+    { icon: Globe, label: 'OpenRouter Setup', prompt: 'OPENROUTER_DASHBOARD' },
     { icon: BookOpen, label: 'Explain OOP', prompt: 'Explain Object Oriented Programming' },
-    { icon: Brain, label: 'Data Structures', prompt: 'Tell me about BSTs' },
     { icon: Sparkles, label: 'Set API Key', prompt: 'GEMINI_SETTINGS' }
   ];
 
@@ -71,10 +70,10 @@ What should we master today?`
   };
 
   const saveApiKey = (key: string) => {
-    localStorage.setItem('nuconnect_gemini_key', key);
+    localStorage.setItem('nuconnect_openrouter_key', key);
     setApiKey(key);
     setShowKeyModal(false);
-    setMessages(prev => [...prev, { role: 'ai', content: "✅ API Key saved! I'm now powered by Gemini for all your questions." }]);
+    setMessages(prev => [...prev, { role: 'ai', content: "✅ OpenRouter connected! Your Study Buddy is now globally powered." }]);
   };
 
   const extractTextFromPDF = async (file: File): Promise<string> => {
@@ -118,25 +117,41 @@ What should we master today?`
       }
     }
 
-    // Try Gemini if Key available
+    // OpenRouter Logic
     if (apiKey) {
       try {
-        const genAI = new GoogleGenerativeAI(apiKey);
-        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+        const historyContext = learnedSessionData.map(d => `Content from ${d.fileName}: ${d.content.substring(0, 1500)}`).join('\n\n');
 
-        const historyContext = learnedSessionData.map(d => `Content from ${d.fileName}: ${d.content.substring(0, 2000)}`).join('\n\n');
-        const prompt = `You are a professional CS Study Buddy. 
-        Context from current documents/memory: ${historyContext} ${contextText ? `\nNew Attachment: ${contextText.substring(0, 3000)}` : ''}
-        
-        Question: ${query}
-        
-        Instructions: Provide a concise, helpful academic response. If the information isn't in the documents or your knowledge, say so politely. Use markdown for lists and code.`;
+        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${apiKey}`,
+            "HTTP-Referer": window.location.origin,
+            "X-Title": "NUConnect Study Buddy",
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            "model": "google/gemini-2.0-flash-001", // High performance default
+            "messages": [
+              {
+                "role": "system",
+                "content": `You are a professional CS Study Buddy for NUConnect. 
+                Use this context from previous documents: ${historyContext} ${contextText ? `\nNew Attachment: ${contextText.substring(0, 3000)}` : ''}
+                Be concise, use formal academic tone, and use markdown for formatting.`
+              },
+              {
+                "role": "user",
+                "content": query
+              }
+            ]
+          })
+        });
 
-        const result = await model.generateContent(prompt);
-        return result.response.text();
+        const data = await response.json();
+        return data.choices[0].message.content;
       } catch (err) {
-        console.error("Gemini Error:", err);
-        return "❌ I had trouble reaching my AI core. Using local fallback instead...";
+        console.error("OpenRouter Error:", err);
+        return "❌ OpenRouter Connection Failed. Please check your API key.";
       }
     }
 
