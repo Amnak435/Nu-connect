@@ -25,7 +25,7 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
   const [apiKey, setApiKey] = useState(() =>
     localStorage.getItem('nuconnect_openrouter_key') ||
     (import.meta as any).env.VITE_OPENROUTER_API_KEY ||
-    ''
+    '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'
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -287,11 +287,11 @@ What should we master today?`
         {messages.map((msg, i) => (
           <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'} animate-in fade-in slide-in-from-bottom-2 duration-300`}>
             <div className={`flex gap-3 max-w-[90%] sm:max-w-[80%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 shadow-sm border ${msg.role === 'user' ? 'bg-green-700 border-green-800' : 'bg-gray-100 border-gray-200'}`}>
+              <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg flex items-center justify-center shrink-0 shadow-sm border ${msg.role === 'user' ? 'bg-green-600 border-green-700' : 'bg-gray-100 border-gray-200'}`}>
                 {msg.role === 'user' ? <Trophy className="w-5 h-5 text-white" /> : <Bot className="w-5 h-5 text-green-700" />}
               </div>
-              <div className={`p-4 rounded-xl shadow-sm text-sm ${msg.role === 'user' ? 'bg-green-700 text-white rounded-tr-none' : 'bg-gray-50 text-gray-800 border border-gray-100 rounded-tl-none'}`}>
-                <div className="prose prose-sm prose-green max-w-none whitespace-pre-wrap leading-relaxed font-medium">
+              <div className={`p-4 rounded-xl shadow-sm text-sm ${msg.role === 'user' ? 'bg-green-600 text-white rounded-tr-none' : 'bg-white text-gray-800 border border-gray-200 rounded-tl-none'}`}>
+                <div className="prose prose-sm prose-green max-w-none whitespace-pre-wrap leading-relaxed font-bold">
                   {msg.content}
                 </div>
               </div>
