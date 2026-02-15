@@ -149,7 +149,16 @@ What should we master today?`
     );
 
     if (core) {
-      response = `### ${core.topic}\n\n${core.explanation}\n\n*Related: ${core.related?.join(', ') || 'None'}*`;
+      response = `### ${core.topic} (Semester ${core.semester})`;
+      if (core.definition) response += `\n\n**Definition:** ${core.definition}`;
+      response += `\n\n${core.explanation}`;
+      if (core.simple) response += `\n\n*💡 Simple Mode: ${core.simple}*`;
+      if (core.example) response += `\n\n**Example:** \`${core.example}\``;
+      if (core.complexity) response += `\n\n**Efficiency:** ${core.complexity}`;
+      if (core.questions && core.questions.length > 0) {
+        response += `\n\n**Practice Questions:**\n` + core.questions.map(q => `* ${q}`).join('\n');
+      }
+      if (core.related) response += `\n\n*Related: ${core.related.join(', ')}*`;
     }
     // Memory Check
     else {
@@ -240,8 +249,8 @@ What should we master today?`
                 {msg.role === 'user' ? <Trophy className="w-5 h-5 sm:w-7 sm:h-7 text-white" /> : <Bot className="w-5 h-5 sm:w-7 sm:h-7 text-emerald-800" />}
               </div>
               <div className={`p-3 sm:p-5 rounded-2xl sm:rounded-[2rem] shadow-sm leading-relaxed ${msg.role === 'user'
-                  ? 'bg-emerald-800 text-white rounded-tr-none font-bold'
-                  : 'bg-white text-gray-900 border border-emerald-100 rounded-tl-none font-bold'
+                ? 'bg-emerald-800 text-white rounded-tr-none font-bold'
+                : 'bg-white text-gray-900 border border-emerald-100 rounded-tl-none font-bold'
                 }`}>
                 <div className="text-xs sm:text-[15px] whitespace-pre-wrap tracking-tight">
                   {msg.content}
