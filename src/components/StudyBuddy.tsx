@@ -105,6 +105,11 @@ What should we master today?`
 
   const generateResponse = async (query: string, file?: File): Promise<string> => {
     let contextText = "";
+    let finalQuery = query;
+
+    if (!finalQuery.trim() && file) {
+      finalQuery = `I've uploaded ${file.name}. Please analyze this document, summarize its main contents, and list the key Computer Science topics I should study from it.`;
+    }
 
     // Process File if attached
     if (file && file.type === 'application/pdf') {
@@ -145,7 +150,7 @@ What should we master today?`
               },
               {
                 "role": "user",
-                "content": query
+                "content": finalQuery
               }
             ]
           })
@@ -160,7 +165,7 @@ What should we master today?`
     }
 
     // Local Fallback Logic
-    const q = query.toLowerCase();
+    const q = finalQuery.toLowerCase();
     const core = csKnowledgeBase.find(c =>
       c.topic.toLowerCase() === q ||
       c.keywords.some(k => q.includes(k.toLowerCase())) ||
@@ -313,14 +318,25 @@ What should we master today?`
       {/* Footer / Input */}
       <div className="p-4 sm:p-6 bg-gray-50/50 space-y-4">
         {attachment && (
-          <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 shadow-sm animate-in zoom-in-95">
-            <div className="bg-green-50 p-2 rounded-md text-green-700">
-              <FileText className="w-4 h-4" />
+          <div className="flex flex-col gap-2 animate-in zoom-in-95">
+            <div className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-100 shadow-sm">
+              <div className="bg-green-50 p-2 rounded-md text-green-700">
+                <FileText className="w-4 h-4" />
+              </div>
+              <span className="text-xs font-semibold text-gray-700 truncate flex-1">{attachment.file.name}</span>
+              <button onClick={() => setAttachment(null)} className="p-1.5 hover:bg-gray-100 rounded-md text-red-500 transition-colors">
+                <X className="w-4 h-4" />
+              </button>
             </div>
-            <span className="text-xs font-semibold text-gray-700 truncate flex-1">{attachment.file.name}</span>
-            <button onClick={() => setAttachment(null)} className="p-1.5 hover:bg-gray-100 rounded-md text-red-500 transition-colors">
-              <X className="w-4 h-4" />
-            </button>
+            {!inputMessage && (
+              <button
+                onClick={handleSendMessage}
+                className="flex items-center justify-center gap-2 w-full py-2.5 bg-green-600 text-white text-xs font-bold rounded-lg shadow-sm hover:bg-green-700 transition-all active:scale-[0.98]"
+              >
+                <Zap className="w-3.5 h-3.5 fill-white" />
+                Process & Learn from PDF
+              </button>
+            )}
           </div>
         )}
 
