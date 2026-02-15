@@ -280,6 +280,43 @@ export function AdminPanel() {
         }
     };
 
+    const handleCareerImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error('Image size must be less than 5MB');
+            return;
+        }
+
+        setUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `career-${Math.random()}.${fileExt}`;
+            const filePath = `careers/${fileName}`;
+
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('portal-docs')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('portal-docs')
+                .getPublicUrl(filePath);
+
+            setCareerForm({
+                ...careerForm,
+                image_url: publicUrl
+            });
+            toast.success('Company logo uploaded!');
+        } catch (err: any) {
+            toast.error('Upload failed: ' + err.message);
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const handleCreateDocument = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!docForm.file_url) {
@@ -589,13 +626,28 @@ export function AdminPanel() {
                                             />
                                         </div>
                                         <div className="col-span-2">
-                                            <label className="block text-sm font-medium mb-1">Image URL</label>
-                                            <input
-                                                className="w-full border rounded-lg p-2.5"
-                                                placeholder="https://example.com/logo.png"
-                                                value={careerForm.image_url}
-                                                onChange={e => setCareerForm({ ...careerForm, image_url: e.target.value })}
-                                            />
+                                            <label className="block text-sm font-medium mb-1">Company logo / Image</label>
+                                            <div className="bg-gray-50 border-2 border-dashed rounded-xl p-4 text-center relative hover:bg-gray-100 transition-all cursor-pointer">
+                                                <input
+                                                    type="file"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    accept="image/*"
+                                                    onChange={handleCareerImageUpload}
+                                                    disabled={uploading}
+                                                />
+                                                <div className="flex items-center justify-center gap-3">
+                                                    <div className="bg-white p-2 rounded-full shadow-sm text-blue-600">
+                                                        {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> :
+                                                            careerForm.image_url ? <CheckCircle className="w-5 h-5 text-green-600" /> : <ImageIcon className="w-5 h-5" />}
+                                                    </div>
+                                                    <p className="text-sm font-medium text-gray-700">
+                                                        {careerForm.image_url ? 'Logo Uploaded!' : 'Click to upload logo'}
+                                                    </p>
+                                                    {careerForm.image_url && (
+                                                        <img src={careerForm.image_url} alt="Preview" className="w-8 h-8 rounded object-cover border" />
+                                                    )}
+                                                </div>
+                                            </div>
                                         </div>
                                         <div className="col-span-2">
                                             <label className="block text-sm font-medium mb-1">Application Link</label>

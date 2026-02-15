@@ -140,7 +140,7 @@ What should we master today?`
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            "model": "google/gemini-2.0-flash-001", // High performance default
+            "model": "google/gemini-2.0-flash-001",
             "messages": [
               {
                 "role": "system",
@@ -156,11 +156,23 @@ What should we master today?`
           })
         });
 
+        if (!response.ok) {
+          const errData = await response.json().catch(() => ({}));
+          console.error("OpenRouter API Error:", response.status, errData);
+          if (response.status === 401) return "❌ Invalid API Key. Please check your OpenRouter key in Settings.";
+          if (response.status === 402) return "❌ Insufficient Credits. Your OpenRouter account needs a top-up.";
+          if (response.status === 429) return "❌ Rate Limited. Please wait a moment before trying again.";
+          return `❌ AI Connection Error (${response.status}). Please try again later.`;
+        }
+
         const data = await response.json();
-        return data.choices[0].message.content;
+        if (data.choices && data.choices[0]?.message?.content) {
+          return data.choices[0].message.content;
+        }
+        return "❌ Received an empty response from AI. Please try again.";
       } catch (err) {
-        console.error("OpenRouter Error:", err);
-        return "❌ OpenRouter Connection Failed. Please check your API key.";
+        console.error("OpenRouter Fetch Error:", err);
+        return "❌ Connection Failed. Please check your internet or API settings.";
       }
     }
 

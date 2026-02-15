@@ -80,8 +80,8 @@ export function Careers() {
                             key={type}
                             onClick={() => setFilterType(type as any)}
                             className={`flex-1 md:flex-none px-4 py-2 rounded-lg text-sm font-medium transition-all ${filterType === type
-                                    ? 'bg-blue-600 text-white shadow-md'
-                                    : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
+                                ? 'bg-blue-600 text-white shadow-md'
+                                : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
                                 }`}
                         >
                             {type}
@@ -153,10 +153,10 @@ export function Careers() {
                                     href={job.apply_link}
                                     target="_blank"
                                     rel="noopener noreferrer"
-                                    className="flex items-center justify-center gap-2 w-full py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all shadow-md active:scale-95"
+                                    className="flex items-center justify-center gap-2 w-full py-3.5 bg-gradient-to-r from-green-600 to-emerald-700 text-white font-extrabold rounded-xl hover:from-green-700 hover:to-emerald-800 transition-all shadow-lg hover:shadow-green-500/20 active:scale-[0.98] group/btn"
                                 >
                                     Apply Now
-                                    <ExternalLink className="w-4 h-4" />
+                                    <ExternalLink className="w-4 h-4 group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform" />
                                 </a>
                             </div>
                         </div>
