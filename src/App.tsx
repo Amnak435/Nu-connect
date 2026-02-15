@@ -178,10 +178,9 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <img src={nutechLogo} alt="NUTECH" className="w-10 h-10 rounded-lg" />
               <div>
-                <h1 className="text-xl font-bold">NUConnect</h1>
-                <p className="text-xs text-green-100">Your Digital Campus</p>
+                <h1 className="text-xl font-bold tracking-tight">NUConnect</h1>
+                <p className="text-xs text-green-100/90 font-medium">Your Digital Campus</p>
               </div>
             </div>
 
