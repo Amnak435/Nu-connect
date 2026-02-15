@@ -626,7 +626,7 @@ export function AdminPanel() {
                                             />
                                         </div>
                                         <div className="col-span-2">
-                                            <label className="block text-sm font-medium mb-1">Company logo / Image</label>
+                                            <label className="block text-sm font-medium mb-1">Job Ad Poster / Company Logo</label>
                                             <div className="bg-gray-50 border-2 border-dashed rounded-xl p-4 text-center relative hover:bg-gray-100 transition-all cursor-pointer">
                                                 <input
                                                     type="file"
@@ -641,7 +641,7 @@ export function AdminPanel() {
                                                             careerForm.image_url ? <CheckCircle className="w-5 h-5 text-green-600" /> : <ImageIcon className="w-5 h-5" />}
                                                     </div>
                                                     <p className="text-sm font-medium text-gray-700">
-                                                        {careerForm.image_url ? 'Logo Uploaded!' : 'Click to upload logo'}
+                                                        {careerForm.image_url ? 'Poster/Logo Uploaded!' : 'Click to upload Job Ad or Logo'}
                                                     </p>
                                                     {careerForm.image_url && (
                                                         <img src={careerForm.image_url} alt="Preview" className="w-8 h-8 rounded object-cover border" />

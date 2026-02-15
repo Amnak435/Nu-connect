@@ -113,9 +113,14 @@ export function Careers() {
                     {filteredJobs.map((job) => (
                         <div key={job.id} className="bg-white rounded-3xl overflow-hidden shadow-md border border-gray-100 hover:shadow-2xl transition-all duration-300 group flex flex-col h-full card-hover">
                             {/* Image Section */}
-                            <div className="h-52 relative overflow-hidden bg-gray-50 border-b border-gray-50">
+                            <div className="h-64 relative overflow-hidden bg-white border-b border-gray-100 flex items-center justify-center cursor-zoom-in group/img">
                                 {job.image_url ? (
-                                    <img src={job.image_url} alt={job.title} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700" />
+                                    <img
+                                        src={job.image_url}
+                                        alt={job.title}
+                                        className="w-full h-full object-contain p-2 group-hover/img:scale-105 transition-transform duration-700"
+                                        onClick={() => window.open(job.image_url, '_blank')}
+                                    />
                                 ) : (
                                     <div className="w-full h-full flex items-center justify-center text-gray-200">
                                         <ImageIcon className="w-16 h-16" />
