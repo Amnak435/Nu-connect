@@ -22,7 +22,11 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
   const [isTyping, setIsTyping] = useState(false);
   const [attachment, setAttachment] = useState<{ file: File; type: string } | null>(null);
   const [showKeyModal, setShowKeyModal] = useState(false);
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('nuconnect_openrouter_key') || '');
+  const [apiKey, setApiKey] = useState(() =>
+    localStorage.getItem('nuconnect_openrouter_key') ||
+    (import.meta as any).env.VITE_OPENROUTER_API_KEY ||
+    ''
+  );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
