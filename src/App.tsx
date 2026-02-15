@@ -9,6 +9,7 @@ import { Contacts } from './components/Contacts';
 import { Announcements } from './components/Announcements';
 import { Fees } from './components/Fees';
 import { Complaints } from './components/Complaints';
+import { Careers } from './components/Careers';
 import { Login } from './components/Login';
 import GeminiTest from './components/GeminiTest';
 import { supabase } from './lib/supabase';
@@ -27,7 +28,8 @@ import {
   Menu,
   X,
   Loader2,
-  Lock
+  Lock,
+  Briefcase
 } from 'lucide-react';
 import { AdminPanel } from './components/AdminPanel';
 import nutechLogo from 'figma:asset/2e00157302a9218f37a6b07498488713f16d8e8a.png';
@@ -133,6 +135,7 @@ export default function App() {
     { id: 'announcements', label: 'Announcements', icon: Megaphone },
     { id: 'fees', label: 'Fees & Payments', icon: CreditCard },
     { id: 'complaints', label: 'Complaints', icon: MessageSquare },
+    { id: 'careers', label: 'Jobs & Internships', icon: Briefcase },
   ];
 
   // Add Admin Panel item for admins or owner
@@ -162,6 +165,8 @@ export default function App() {
         return <Fees user={currentUser} />;
       case 'complaints':
         return <Complaints user={currentUser} />;
+      case 'careers':
+        return <Careers />;
       case 'admin-panel':
         return <AdminPanel />;
       case 'test-api':
