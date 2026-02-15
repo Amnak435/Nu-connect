@@ -144,6 +144,72 @@ export const csKnowledgeBase: CSConcept[] = [
         definition: 'Encryption protects secrecy; Hashing ensures data hasn\'t changed.',
         explanation: '2FA adds a second layer of security (e.g., phone code + password).',
         related: ['Information Security', 'Malware']
+    },
+    // --- DATABASES & DATA MANAGEMENT ---
+    {
+        id: 'db-001',
+        semester: 4,
+        subject: 'Database Systems',
+        topic: 'SQL & Normalization',
+        keywords: ['sql', 'database', 'rdbms', 'normalization', 'primary key', 'foreign key', 'join'],
+        definition: 'Structured Query Language for managing relational data.',
+        explanation: 'Normalization (1NF, 2NF, 3NF, BCNF) reduces data redundancy. SQL provides DDL and DML operations.',
+        simple: 'Normalization is like organizing your closet so you find things in one place instead of having copies of the same shirt everywhere.',
+        related: ['ACID Properties', 'NoSQL']
+    },
+    {
+        id: 'db-002',
+        semester: 4,
+        subject: 'Database Systems',
+        topic: 'ACID Properties',
+        keywords: ['acid', 'atomicity', 'consistency', 'isolation', 'durability', 'transaction'],
+        definition: 'Set of properties that guarantee database transactions are processed reliably.',
+        explanation: 'Atomicity (all or nothing), Consistency (valid state), Isolation (independent transactions), Durability (permanent changes).',
+        related: ['Concurrency Control', 'Indexing']
+    },
+    // --- MATHEMATICS & LOGIC ---
+    {
+        id: 'dm-001',
+        semester: 2,
+        subject: 'Discrete Mathematics',
+        topic: 'Set Theory & Logic',
+        keywords: ['set', 'subset', 'union', 'intersection', 'proposition', 'truth table'],
+        definition: 'Study of mathematical structures that are discrete rather than continuous.',
+        explanation: 'Set theory deals with collections of objects. Logic involves propositions, predicates, and proofs.',
+        related: ['Graph Theory', 'Combinatorics']
+    },
+    // --- SOFTWARE ENGINEERING & TESTING ---
+    {
+        id: 'se-003',
+        semester: 5,
+        subject: 'Software Engineering',
+        topic: 'Software Testing',
+        keywords: ['unit test', 'integration test', 'black box', 'white box', 'qa', 'regression'],
+        definition: 'Process of evaluating software to find errors and ensure quality.',
+        explanation: 'Black-box tests focus on inputs/outputs. White-box tests check internal logic. Unit tests check individual modules.',
+        related: ['DevOps', 'CI/CD']
+    },
+    // --- COMPUTER ARCHITECTURE ---
+    {
+        id: 'ca-001',
+        semester: 4,
+        subject: 'Computer Architecture',
+        topic: 'Pipelining & RISC',
+        keywords: ['pipeline', 'risc', 'cisc', 'cpu', 'instruction', 'hazard'],
+        definition: 'Technique that increases instruction throughput by overlapping operations.',
+        explanation: 'Pipelining handles multiple instructions simultaneously. RISC focuses on simple, fast instructions.',
+        related: ['Cache', 'Instruction Set']
+    },
+    // --- NETWORKS & PROTOCOLS ---
+    {
+        id: 'net-002',
+        semester: 5,
+        subject: 'Computer Networks',
+        topic: 'TCP/IP vs OSI',
+        keywords: ['tcp', 'udp', 'ip', 'socket', 'http', 'https', 'dns'],
+        definition: 'Network protocols for reliable or fast data transmission.',
+        explanation: 'TCP is connection-oriented (reliable). UDP is connectionless (fast). DNS maps domain names to IPs.',
+        related: ['IP Addressing', 'Subnetting']
     }
 ];
 

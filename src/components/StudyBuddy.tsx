@@ -25,7 +25,7 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
   const [apiKey, setApiKey] = useState(() =>
     localStorage.getItem('nuconnect_openrouter_key') ||
     (import.meta as any).env.VITE_OPENROUTER_API_KEY ||
-    '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'
+    '' // Remove hardcoded dead key
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const messagesEndRef = useRef<HTMLDivElement>(null);
@@ -53,10 +53,12 @@ export function StudyBuddy({ user }: StudyBuddyProps) {
       {
         role: 'ai',
         content: `Hello ${user?.name?.split(' ')[0] || 'Friend'}! 🎓 I'm your **Multi-Engine** Study Buddy.
+        
+🚀 **Mode Active:** ${apiKey ? 'Advanced AI Core' : 'High-Performance Guest Mode'}
 
-🚀 **AI Core Active:** I'm connected and ready to help you master your courses. You can ask me anything or upload a PDF to start learning!
+I'm ready to help you master your courses. Ask me about core CS topics like **OOP, Data Structures, OS, or Networks**! You can also upload a PDF to start learning!
 
-What should we master today?`
+${!apiKey ? '💡 *Using built-in knowledge mode. Connect an API Key in Settings for multi-modal analysis!*' : ''}`
       }
     ]);
   }, [user?.name, learnedSessionData.length, !!apiKey]);
@@ -140,7 +142,7 @@ What should we master today?`
             "Content-Type": "application/json"
           },
           body: JSON.stringify({
-            "model": "google/gemini-2.0-flash-001",
+            "model": "google/gemini-2.0-pro-exp-02-05:free", // Use free tier by default
             "messages": [
               {
                 "role": "system",
@@ -160,8 +162,8 @@ What should we master today?`
           const errData = await response.json().catch(() => ({}));
           console.error("OpenRouter API Error:", response.status, errData);
           if (response.status === 401) return "❌ Invalid API Key. Please check your OpenRouter key in Settings.";
-          if (response.status === 402) return "❌ Insufficient Credits. Your OpenRouter account needs a top-up.";
-          if (response.status === 429) return "❌ Rate Limited. Please wait a moment before trying again.";
+          if (response.status === 402) return "❌ Insufficient Credits. Visit [openrouter.ai](https://openrouter.ai/credits) to top up or create a new free-tier key.";
+          if (response.status === 429) return "❌ Rate Limited. Free models often have lower limits. Please wait.";
           return `❌ AI Connection Error (${response.status}). Please try again later.`;
         }
 
@@ -169,14 +171,13 @@ What should we master today?`
         if (data.choices && data.choices[0]?.message?.content) {
           return data.choices[0].message.content;
         }
-        return "❌ Received an empty response from AI. Please try again.";
+        return "❌ Received an empty response from AI. Falling back to local knowledge...";
       } catch (err) {
         console.error("OpenRouter Fetch Error:", err);
-        return "❌ Connection Failed. Please check your internet or API settings.";
       }
     }
 
-    // Local Fallback Logic
+    // Local Fallback Logic (Guest Mode)
     const q = finalQuery.toLowerCase();
     const core = csKnowledgeBase.find(c =>
       c.topic.toLowerCase() === q ||
