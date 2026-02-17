@@ -149,12 +149,12 @@ export function UniversityEvents({ user }: UniversityEventsProps) {
         <div className="space-y-6 animate-in fade-in duration-500">
             {/* Header */}
             <div
-                className="rounded-2xl p-8 text-white shadow-xl relative overflow-hidden ring-1 ring-white/10"
+                className="rounded-2xl p-6 md:p-8 text-white shadow-xl relative overflow-hidden ring-1 ring-white/10"
                 style={{ background: 'linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%)', backgroundColor: '#7c3aed' }}
             >
                 <div className="relative z-10">
-                    <h2 className="text-3xl font-extrabold mb-2 tracking-tight">University Events 🎉</h2>
-                    <p className="text-purple-50 font-medium max-w-2xl text-lg opacity-90">
+                    <h2 className="text-2xl md:text-3xl font-extrabold mb-2 tracking-tight">University Events 🎉</h2>
+                    <p className="text-purple-50 font-medium max-w-2xl text-base md:text-lg opacity-90">
                         Stay updated with the latest happenings at campus. Discover events, workshops, seminars, and activities from NUTECH.
                     </p>
                 </div>
@@ -162,13 +162,13 @@ export function UniversityEvents({ user }: UniversityEventsProps) {
             </div>
 
             {/* Filters */}
-            <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-5 rounded-2xl shadow-sm border border-gray-100">
+            <div className="flex flex-col md:flex-row gap-4 items-center bg-white p-4 md:p-5 rounded-2xl shadow-sm border border-gray-100">
                 <div className="relative flex-1 w-full">
-                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 font-bold" />
+                    <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5 font-bold pointer-events-none" />
                     <input
                         type="text"
                         placeholder="Search events..."
-                        className="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 outline-none transition-all"
+                        className="w-full pl-14 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-4 focus:ring-purple-500/10 focus:border-purple-500 outline-none transition-all"
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                     />
@@ -178,7 +178,7 @@ export function UniversityEvents({ user }: UniversityEventsProps) {
                         <button
                             key={type}
                             onClick={() => setFilterType(type as any)}
-                            className={`flex-1 md:flex-none px-6 py-2.5 rounded-lg text-sm font-bold transition-all capitalize ${filterType === type
+                            className={`flex-1 md:flex-none px-4 md:px-6 py-2.5 rounded-lg text-sm font-bold transition-all capitalize ${filterType === type
                                 ? 'bg-purple-600 text-white shadow-lg shadow-purple-500/30'
                                 : 'text-gray-600 hover:bg-white hover:shadow-sm'
                                 }`}
@@ -224,12 +224,12 @@ export function UniversityEvents({ user }: UniversityEventsProps) {
                                 )}
                                 {/* Event Date Badge */}
                                 {event.event_date && (
-                                    <div className="absolute top-5 right-5 bg-white/95 backdrop-blur-md rounded-xl p-3 shadow-xl">
-                                        <div className="text-center">
-                                            <p className="text-xs font-bold text-purple-600 uppercase">
+                                    <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-md rounded-xl p-2.5 shadow-lg border border-gray-100 z-10">
+                                        <div className="text-center min-w-[3.5rem]">
+                                            <p className="text-xs font-bold text-purple-600 uppercase tracking-wider">
                                                 {new Date(event.event_date).toLocaleDateString('en-US', { month: 'short' })}
                                             </p>
-                                            <p className="text-2xl font-black text-gray-900">
+                                            <p className="text-2xl font-black text-gray-900 leading-none mt-0.5">
                                                 {new Date(event.event_date).getDate()}
                                             </p>
                                         </div>
