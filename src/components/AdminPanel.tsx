@@ -21,11 +21,12 @@ import {
     ImageIcon,
     CreditCard,
     MessageSquare,
-    Briefcase
+    Briefcase,
+    CalendarDays
 } from 'lucide-react';
 import { toast } from 'sonner';
 
-type AdminTab = 'announcements' | 'timetable' | 'documents' | 'users' | 'fees' | 'complaints' | 'attendance' | 'careers';
+type AdminTab = 'announcements' | 'timetable' | 'documents' | 'users' | 'fees' | 'complaints' | 'attendance' | 'careers' | 'university-events';
 
 export function AdminPanel() {
     const [activeTab, setActiveTab] = useState<AdminTab>('announcements');
@@ -94,6 +95,19 @@ export function AdminPanel() {
         salary: ''
     });
 
+    // University Events Form State
+    const [eventForm, setEventForm] = useState({
+        title: '',
+        caption: '',
+        event_link: '',
+        image_url: '',
+        event_date: '',
+        visibility_type: 'everyone',
+        target_batch: 'All',
+        target_section: 'All',
+        target_semester: 'All'
+    });
+
     const semesters = ['1st Semester', '2nd Semester', '3rd Semester', '4th Semester', '5th Semester', '6th Semester', '7th Semester', '8th Semester'];
     const batches = ['2021', '2022', '2023', '2024', '2025', '2026'];
     const sections = ['A', 'B', 'C', 'D', 'All'];
@@ -133,6 +147,9 @@ export function AdminPanel() {
                 break;
             case 'careers':
                 query = supabase.from('careers').select('*').order('posted_at', { ascending: false });
+                break;
+            case 'university-events':
+                query = supabase.from('university_events').select('*').order('posted_at', { ascending: false });
                 break;
         }
 
@@ -317,6 +334,43 @@ export function AdminPanel() {
         }
     };
 
+    const handleEventImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        if (file.size > 5 * 1024 * 1024) {
+            toast.error('Image size must be less than 5MB');
+            return;
+        }
+
+        setUploading(true);
+        try {
+            const fileExt = file.name.split('.').pop();
+            const fileName = `event-${Math.random()}.${fileExt}`;
+            const filePath = `events/${fileName}`;
+
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('portal-docs')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('portal-docs')
+                .getPublicUrl(filePath);
+
+            setEventForm({
+                ...eventForm,
+                image_url: publicUrl
+            });
+            toast.success('Event image uploaded!');
+        } catch (err: any) {
+            toast.error('Upload failed: ' + err.message);
+        } finally {
+            setUploading(false);
+        }
+    };
+
     const handleCreateDocument = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!docForm.file_url) {
@@ -369,6 +423,24 @@ export function AdminPanel() {
         setLoading(false);
     };
 
+    const handleCreateEvent = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        const { error } = await supabase.from('university_events').insert([eventForm]);
+        if (error) {
+            toast.error('Error posting university event');
+        } else {
+            toast.success('University event posted successfully!');
+            setIsAdding(false);
+            setEventForm({
+                title: '', caption: '', event_link: '', image_url: '', event_date: '',
+                visibility_type: 'everyone', target_batch: 'All', target_section: 'All', target_semester: 'All'
+            });
+            fetchData();
+        }
+        setLoading(false);
+    };
+
     const handleDelete = async (id: string, table: string) => {
         if (!confirm('Are you sure you want to delete this?')) return;
         const { error } = await supabase.from(table).delete().eq('id', id);
@@ -409,6 +481,7 @@ export function AdminPanel() {
                         { id: 'attendance', label: 'Attendance', icon: GraduationCap },
                         { id: 'complaints', label: 'Complaints', icon: MessageSquare },
                         { id: 'careers', label: 'Jobs & Internships', icon: Briefcase },
+                        { id: 'university-events', label: 'University Events', icon: CalendarDays },
                     ].map((tab) => (
                         <button
                             key={tab.id}
@@ -448,7 +521,7 @@ export function AdminPanel() {
                             )}
                         </h3>
                     </div>
-                    {!isAdding && ['announcements', 'timetable', 'documents', 'fees', 'attendance', 'users', 'careers'].includes(activeTab) && (
+                    {!isAdding && ['announcements', 'timetable', 'documents', 'fees', 'attendance', 'users', 'careers', 'university-events'].includes(activeTab) && (
                         <button
                             onClick={() => {
                                 setIsAdding(true);
@@ -676,6 +749,144 @@ export function AdminPanel() {
                                         <button type="button" onClick={() => setIsAdding(false)} className="bg-gray-100 text-gray-700 px-6 py-2.5 rounded-lg font-medium">Cancel</button>
                                     </div>
                                 </form>
+                            ) : activeTab === 'university-events' ? (
+                                <form onSubmit={handleCreateEvent} className="space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                        <div className="col-span-2">
+                                            <label className="block text-sm font-medium mb-1">Event Title</label>
+                                            <input
+                                                required
+                                                className="w-full border rounded-lg p-2.5"
+                                                placeholder="e.g. Tech Summit 2024"
+                                                value={eventForm.title}
+                                                onChange={e => setEventForm({ ...eventForm, title: e.target.value })}
+                                            />
+                                        </div>
+                                        <div className="col-span-2">
+                                            <label className="block text-sm font-medium mb-1">Event Image / Poster</label>
+                                            <div className="bg-gray-50 border-2 border-dashed rounded-xl p-4 text-center relative hover:bg-gray-100 transition-all cursor-pointer">
+                                                <input
+                                                    type="file"
+                                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                                    accept="image/*"
+                                                    onChange={handleEventImageUpload}
+                                                    disabled={uploading}
+                                                />
+                                                <div className="flex items-center justify-center gap-3">
+                                                    <div className="bg-white p-2 rounded-full shadow-sm text-purple-600">
+                                                        {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> :
+                                                            eventForm.image_url ? <CheckCircle className="w-5 h-5 text-green-600" /> : <ImageIcon className="w-5 h-5" />}
+                                                    </div>
+                                                    <p className="text-sm font-medium text-gray-700">
+                                                        {eventForm.image_url ? 'Event Image Uploaded!' : 'Click to upload Event Poster'}
+                                                    </p>
+                                                    {eventForm.image_url && (
+                                                        <img src={eventForm.image_url} alt="Preview" className="w-8 h-8 rounded object-cover border" />
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div className="col-span-2">
+                                            <label className="block text-sm font-medium mb-1">Caption / Description</label>
+                                            <textarea
+                                                rows={4}
+                                                className="w-full border rounded-lg p-2.5"
+                                                placeholder="Describe the event details..."
+                                                value={eventForm.caption}
+                                                onChange={e => setEventForm({ ...eventForm, caption: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Event Date & Time</label>
+                                            <input
+                                                type="datetime-local"
+                                                className="w-full border rounded-lg p-2.5"
+                                                value={eventForm.event_date}
+                                                onChange={e => setEventForm({ ...eventForm, event_date: e.target.value })}
+                                            />
+                                        </div>
+                                        <div>
+                                            <label className="block text-sm font-medium mb-1">Event Link (Optional)</label>
+                                            <input
+                                                type="url"
+                                                className="w-full border rounded-lg p-2.5"
+                                                placeholder="https://example.com/event"
+                                                value={eventForm.event_link}
+                                                onChange={e => setEventForm({ ...eventForm, event_link: e.target.value })}
+                                            />
+                                        </div>
+
+                                        {/* Visibility Controls */}
+                                        <div className="col-span-2 border-t pt-4">
+                                            <label className="block text-sm font-medium mb-3">Event Visibility</label>
+                                            <div className="flex gap-4 mb-4">
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="radio"
+                                                        name="visibility"
+                                                        value="everyone"
+                                                        checked={eventForm.visibility_type === 'everyone'}
+                                                        onChange={e => setEventForm({ ...eventForm, visibility_type: e.target.value as any })}
+                                                        className="w-4 h-4"
+                                                    />
+                                                    <span className="text-sm font-medium">Everyone</span>
+                                                </label>
+                                                <label className="flex items-center gap-2 cursor-pointer">
+                                                    <input
+                                                        type="radio"
+                                                        name="visibility"
+                                                        value="specific"
+                                                        checked={eventForm.visibility_type === 'specific'}
+                                                        onChange={e => setEventForm({ ...eventForm, visibility_type: e.target.value as any })}
+                                                        className="w-4 h-4"
+                                                    />
+                                                    <span className="text-sm font-medium">Specific Groups</span>
+                                                </label>
+                                            </div>
+
+                                            {eventForm.visibility_type === 'specific' && (
+                                                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 bg-purple-50 p-4 rounded-lg">
+                                                    <div>
+                                                        <label className="block text-xs font-medium mb-1 text-purple-900">Target Batch</label>
+                                                        <select
+                                                            className="w-full border rounded-lg p-2 text-sm"
+                                                            value={eventForm.target_batch}
+                                                            onChange={e => setEventForm({ ...eventForm, target_batch: e.target.value })}
+                                                        >
+                                                            <option value="All">All Batches</option>
+                                                            {batches.map(b => <option key={b} value={b}>{b}</option>)}
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium mb-1 text-purple-900">Target Section</label>
+                                                        <select
+                                                            className="w-full border rounded-lg p-2 text-sm"
+                                                            value={eventForm.target_section}
+                                                            onChange={e => setEventForm({ ...eventForm, target_section: e.target.value })}
+                                                        >
+                                                            {sections.map(s => <option key={s} value={s}>{s}</option>)}
+                                                        </select>
+                                                    </div>
+                                                    <div>
+                                                        <label className="block text-xs font-medium mb-1 text-purple-900">Target Semester</label>
+                                                        <select
+                                                            className="w-full border rounded-lg p-2 text-sm"
+                                                            value={eventForm.target_semester}
+                                                            onChange={e => setEventForm({ ...eventForm, target_semester: e.target.value })}
+                                                        >
+                                                            <option value="All">All Semesters</option>
+                                                            {semesters.map(s => <option key={s} value={s}>{s}</option>)}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className="flex gap-3 pt-4 border-t">
+                                        <button type="submit" className="bg-purple-600 text-white px-8 py-2.5 rounded-lg font-bold shadow-md">Post Event</button>
+                                        <button type="button" onClick={() => setIsAdding(false)} className="bg-gray-100 text-gray-700 px-6 py-2.5 rounded-lg font-medium">Cancel</button>
+                                    </div>
+                                </form>
                             ) : (
                                 <form onSubmit={handleCreateDocument} className="space-y-6">
                                     <div className="bg-gray-50 border-2 border-dashed rounded-xl p-8 text-center relative">
@@ -745,14 +956,16 @@ export function AdminPanel() {
                                                                         activeTab === 'fees' ? (feeSubTab === 'structures' ? `${item.semester} Structure` : (item.full_name || item.nutech_id)) :
                                                                             activeTab === 'timetable' ? item.title :
                                                                                 activeTab === 'careers' ? item.title :
-                                                                                    activeTab === 'complaints' ? item.subject : item.title}
+                                                                                    activeTab === 'university-events' ? item.title :
+                                                                                        activeTab === 'complaints' ? item.subject : item.title}
                                                         </span>
                                                         <span className="text-xs text-gray-500">
                                                             {activeTab === 'users' ? item.nutech_id :
                                                                 activeTab === 'attendance' ? item.student_id :
                                                                     activeTab === 'fees' ? (feeSubTab === 'structures' ? `Batch: ${item.batch}` : `Amount: Rs. ${item.amount}`) :
                                                                         activeTab === 'complaints' ? `From: ${item.student_name || 'Anonymous'}` :
-                                                                            item.created_at?.split('T')[0]}
+                                                                            activeTab === 'university-events' ? (item.visibility_type === 'specific' ? `Targeted: ${item.target_batch || 'All'} - ${item.target_section || 'All'}` : 'Visible to Everyone') :
+                                                                                item.created_at?.split('T')[0]}
                                                         </span>
                                                     </div>
                                                 </td>
@@ -764,6 +977,13 @@ export function AdminPanel() {
                                                             <div className="flex flex-col">
                                                                 <span className="font-bold text-blue-600">{item.company}</span>
                                                                 <span className="text-xs text-gray-500">{item.location} | {item.salary}</span>
+                                                            </div>
+                                                        ) : activeTab === 'university-events' ? (
+                                                            <div className="flex flex-col">
+                                                                <span className="line-clamp-1 italic text-gray-400 text-xs">{item.caption || 'No caption'}</span>
+                                                                {item.event_link && (
+                                                                    <a href={item.event_link} target="_blank" rel="noreferrer" className="text-purple-600 underline font-bold text-xs uppercase">View Link</a>
+                                                                )}
                                                             </div>
                                                         ) : (activeTab === 'documents' || activeTab === 'timetable' || activeTab === 'fees') ? (
                                                             <div className="flex items-center gap-2">
@@ -804,7 +1024,8 @@ export function AdminPanel() {
                                                                             activeTab === 'users' ? 'student_profiles' :
                                                                                 activeTab === 'fees' ? (feeSubTab === 'structures' ? 'fee_structures' : 'fee_submissions') :
                                                                                     activeTab === 'attendance' ? 'attendance' :
-                                                                                        activeTab === 'careers' ? 'careers' : ''
+                                                                                        activeTab === 'careers' ? 'careers' :
+                                                                                            activeTab === 'university-events' ? 'university_events' : ''
                                                             )}
                                                             className="p-2 text-red-600 bg-red-50 rounded-lg"
                                                         >

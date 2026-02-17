@@ -3,7 +3,7 @@ import { Dashboard } from './components/Dashboard';
 import { WeeklyPlan } from './components/WeeklyPlan';
 import { DateSheet } from './components/DateSheet';
 import { Syllabus } from './components/Syllabus';
-import { StudyBuddy } from './components/StudyBuddy';
+import { UniversityEvents } from './components/UniversityEvents';
 import { ClassroomSync } from './components/ClassroomSync';
 import { Contacts } from './components/Contacts';
 import { Announcements } from './components/Announcements';
@@ -29,7 +29,8 @@ import {
   X,
   Loader2,
   Lock,
-  Briefcase
+  Briefcase,
+  PartyPopper
 } from 'lucide-react';
 import { AdminPanel } from './components/AdminPanel';
 import nutechLogo from 'figma:asset/2e00157302a9218f37a6b07498488713f16d8e8a.png';
@@ -129,7 +130,7 @@ export default function App() {
     { id: 'weekly-plan', label: 'Weekly Plan', icon: Calendar },
     { id: 'date-sheet', label: 'Date Sheet', icon: CalendarDays },
     { id: 'syllabus', label: 'Syllabus', icon: BookOpen },
-    { id: 'study-buddy', label: 'Study Buddy AI', icon: Bot },
+    { id: 'university-events', label: 'University Events', icon: PartyPopper },
     { id: 'classroom', label: 'Classroom Sync', icon: Users },
     { id: 'contacts', label: 'Contacts', icon: Phone },
     { id: 'announcements', label: 'Announcements', icon: Megaphone },
@@ -153,8 +154,8 @@ export default function App() {
         return <DateSheet user={currentUser} />;
       case 'syllabus':
         return <Syllabus user={currentUser} />;
-      case 'study-buddy':
-        return <StudyBuddy user={currentUser} />;
+      case 'university-events':
+        return <UniversityEvents user={currentUser} />;
       case 'classroom':
         return <ClassroomSync user={currentUser} />;
       case 'contacts':
